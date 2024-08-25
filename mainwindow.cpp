@@ -4,75 +4,84 @@
 #include <QDebug>
 #include <iostream>
 #include <QComboBox>
- #include <QBoxLayout>
+#include <QBoxLayout>
+#include <QLabel>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , trayIcon(new QSystemTrayIcon(this))
 {
-    // Tray icon menu
-    auto menu = this->createMenu();
-    this->trayIcon->setContextMenu(menu);
+    // Create the main layour container
+    QVBoxLayout *container = new QVBoxLayout();
+    //Create the layout to store the wallpaper source
+    QHBoxLayout *sourceLayout = new QHBoxLayout();
+    container->addLayout(sourceLayout, 0);
 
-    // App icon
-    auto appIcon = QIcon::fromTheme(QIcon::ThemeIcon::EditUndo);
-    this->trayIcon->setIcon(appIcon);
-    this->setWindowIcon(appIcon);
-
-    // Displaying the tray icon
-    this->trayIcon->show();     // Note: without explicitly calling show(), QSystemTrayIcon::activated signal will never be emitted!
-
-    // Interaction
-    connect(trayIcon, &QSystemTrayIcon::activated, this, &MainWindow::iconActivated);
-
-    //Create a grid layout
-    QHBoxLayout *layout = new QHBoxLayout();
-
-
-    // POTD Drop down
+    //Create the label for the potd drop down
+    QLabel *label = new QLabel("Picture of the day source");
+    sourceLayout->addWidget(label, 0, Qt::AlignCenter);
+    // Picture of the day drop down
     QStringList commands = { "Bing", "Wikimedia", "Nasa Earth Observatory", "Nasa" };
     QComboBox* combo = new QComboBox();
-
-
     combo->addItems(commands);
-    connect( combo, &QComboBox::currentTextChanged, this, &MainWindow::commandChanged);
+    connect( combo, &QComboBox::currentTextChanged, this, &MainWindow::sourceChanged);
+    //Add it to the layout
+    sourceLayout->addWidget(combo, 0, Qt::AlignCenter);
 
-    layout->addWidget(combo, 0, Qt::AlignCenter);
+    // Set the current POTD source
+    this->sourceChanged(commands[0]);
 
-    QWidget* widget = new QWidget();
-    widget->setLayout(layout);
-    //this->setCentralWidget(widget);
-    //QWidget *w = new QWidget;
-    widget->resize(500,500);
-    widget->show();
+
+    // Create a region selection for bing region
+    // Create a widget so we can show and hide it
+    QWidget *regionWidget = new QWidget();
+    regionWidget->setObjectName("region-widget");
+    QHBoxLayout *regionLayout = new QHBoxLayout();
+    regionWidget->setLayout(regionLayout);
+    container->addWidget(regionWidget, 0);
+
+    //Create a labek for the regions
+    QLabel *regionLabel = new QLabel("Bing Region");
+    regionLayout->addWidget(regionLabel, 0, Qt::AlignCenter);
+    //Create a combo box for all the regions and add the functionality
+    QStringList regions = { "USA", "Great Britain", "China", "Japan", "Canada", "Australia", "New Zealand", "Germany", "Spain", "France", "Italy", "Brazil" };
+    QComboBox* regionChoice = new QComboBox();
+    regionChoice->addItems(regions);
+    connect(regionChoice, &QComboBox::currentTextChanged, this, &MainWindow::bingRegionChanged);
+    regionLayout->addWidget(regionChoice, 0, Qt::AlignCenter);
+    //Set the default region
+    this->bingRegionChanged(regions[0]);
+
+    // Create a widget to contain our layout
+    QWidget *window = new QWidget(this);
+    window->setLayout(container);
+    // Add the widget to the window
+    this->setCentralWidget(window);
 }
 
-QMenu* MainWindow::createMenu()
+
+void MainWindow::sourceChanged(const QString& newSource)
 {
-    // App can exit via Quit menu
-    auto quitAction = new QAction("&Quit", this);
-    connect(quitAction, &QAction::triggered, qApp, &QCoreApplication::quit);
-
-    auto menu = new QMenu(this);
-    menu->addAction(quitAction);
-
-    return menu;
-}
-
-void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason_)
-{
-    switch (reason_) {
-    case QSystemTrayIcon::Trigger:
-        // std::cout << "here";
-        // this->trayIcon->showMessage("Hello", "You clicked me!");
-        this->show();
-        break;
-    default:
-        ;
+    this->potdSource = newSource;
+    // If user has selected bing
+    bool shouldShow = 0;
+    if(newSource.compare("Bing") == 0){
+        shouldShow = 1;
+    }
+    // Show or hide the widget with the bing region selection
+    QList<QWidget*> allWidgets = this->findChildren<QWidget*>();
+    for (QWidget *widget : allWidgets) {
+        if(widget->objectName().compare("region-widget") == 0){
+            widget->setVisible(shouldShow);
+            break;
+        }
     }
 }
-void MainWindow::commandChanged(const QString& command_text)
-{
-    std::cout << qPrintable(command_text) << std::endl;
-    //Do the logic based on command_text
+QString MainWindow::getPOTDSource(){
+    return this->potdSource;
+}
+void MainWindow::bingRegionChanged(const QString& newRegion){
+    this->bingRegion = newRegion;
+}
+QString MainWindow::getBingRegion(){
+    return this->bingRegion;
 }

@@ -11,15 +11,16 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow(QWidget *parent = 0);
+    QString getPOTDSource();
+    QString getBingRegion();
+
 
 public slots:
-    void iconActivated(QSystemTrayIcon::ActivationReason);
-    void commandChanged(const QString& command_text);
+    void sourceChanged(const QString& command_text);
+    void bingRegionChanged(const QString& command_text);
 
 private:
-    QSystemTrayIcon* trayIcon;
-    QMenu* trayIconMenu;
-
-    QMenu* createMenu();
+    QString potdSource;
+    QString bingRegion;
 };
 #endif // MAINWINDOW_H
