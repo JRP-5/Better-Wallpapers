@@ -7,6 +7,8 @@
 #include <QBoxLayout>
 #include <QLabel>
 
+
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
@@ -39,7 +41,7 @@ MainWindow::MainWindow(QWidget *parent)
     regionWidget->setLayout(regionLayout);
     container->addWidget(regionWidget, 0);
 
-    //Create a labek for the regions
+    //Create a label for the regions
     QLabel *regionLabel = new QLabel("Bing Region");
     regionLayout->addWidget(regionLabel, 0, Qt::AlignCenter);
     //Create a combo box for all the regions and add the functionality
@@ -50,6 +52,8 @@ MainWindow::MainWindow(QWidget *parent)
     regionLayout->addWidget(regionChoice, 0, Qt::AlignCenter);
     //Set the default region
     this->bingRegionChanged(regions[0]);
+
+
 
     // Create a widget to contain our layout
     QWidget *window = new QWidget(this);
