@@ -45,7 +45,7 @@ std::string getExeFolder(char* exePath){
 int main(int argc, char *argv[])
 {
     std::string path = getExeFolder(argv[0]);
-    std::string imgPath = saveTodayPhoto("fr-FR", path);
+    std::string imgPath = saveTodayPhoto("it-IT", path);
     std::cout << "path" << imgPath<< std::endl;
     if(!(imgPath == "")){
         std::cout << setPhoto(imgPath) << std::endl;

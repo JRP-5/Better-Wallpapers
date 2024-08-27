@@ -119,6 +119,6 @@ string saveTodayPhoto(string region, string path)
 // Sets the wallpaper to the image given in the path
 // Windows specific
 int setPhoto(string imgPath){
-    const wchar_t *path = imgPath.c_str();
-    return SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, path, SPIF_UPDATEINIFILE);
+    std::wstring wideImgPath = std::wstring(imgPath.begin(), imgPath.end());
+    return SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, (void *)wideImgPath.c_str(), SPIF_UPDATEINIFILE);
 }
