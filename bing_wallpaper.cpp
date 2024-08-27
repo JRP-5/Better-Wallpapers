@@ -122,12 +122,4 @@ int setPhoto(string imgPath){
     std::wstring wideImgPath = std::wstring(imgPath.begin(), imgPath.end());
     return SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, (void *)wideImgPath.c_str(), SPIF_UPDATEINIFILE);
 }
-struct {
-    string potdSource;
-    string bingRegion;
-    bool changed;
-} wallpaperOption;
 
-void wallpaperLoop(struct wallpaperOption **options){
-
-}

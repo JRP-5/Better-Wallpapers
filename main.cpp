@@ -1,10 +1,11 @@
 #include "mainwindow.h"
-#include <iostream>
 #include <QApplication>
 #include <QCoreApplication>
 #include <QPushButton>
 #include "bing_wallpaper.h"
 #include <QTimer>
+#include "wallpaper_utils.h"
+#include <iostream>
 
 QMainWindow *mainWindow;
 QApplication *app;
@@ -28,6 +29,7 @@ void onTrayIconActivated(QSystemTrayIcon::ActivationReason reason) {
         launchWindow();
     }
 }
+
 std::string getExeFolder(char* exePath){
     int index = -1;
     std::string path = exePath;
@@ -69,8 +71,7 @@ int main(int argc, char *argv[])
     trayIcon.show();
     launchWindow();
 
-    QTimer::singleShot(0, []{
-        std::cout <<"print"<<std::endl;
-    });
+    QThread *thread = QThread::create(&wallpaper_loop);
+    thread->start();
     return app->exec();
 }

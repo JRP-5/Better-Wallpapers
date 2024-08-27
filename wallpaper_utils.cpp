@@ -2,6 +2,9 @@
 #include <string>
 #include <ctime>
 #include <cstring>
+#include <QThread>
+#include <QtCore>
+#include <QObject>
 using namespace std;
 namespace fs = std::filesystem;
 
@@ -23,5 +26,11 @@ void deleteOldImgs(string path, int days){
         if(strcmp(oldDate, fileDate.c_str()) >= 0){
             remove(entry.path().string().c_str());
         }
+    }
+}
+void wallpaper_loop(){
+    while(1){
+
+        QThread::sleep(5);
     }
 }

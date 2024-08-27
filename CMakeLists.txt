@@ -22,6 +22,10 @@ set(PROJECT_SOURCES
         main.cpp
         mainwindow.cpp
         mainwindow.h
+        bing_wallpaper.cpp
+        bing_wallpaper.h
+        wallpaper_utils.cpp
+        wallpaper_utils.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -30,9 +34,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         ${PROJECT_SOURCES}
 
         main.cpp
-        wallpaper_utils.cpp
-        wallpaper_utils.h
-        bing_wallpaper.h bing_wallpaper.cpp
+
+
 
     )
 # Define target properties for Android with Qt 6 as:
