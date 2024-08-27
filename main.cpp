@@ -4,6 +4,7 @@
 #include <QCoreApplication>
 #include <QPushButton>
 #include "bing_wallpaper.h"
+#include <QTimer>
 
 QMainWindow *mainWindow;
 QApplication *app;
@@ -46,15 +47,14 @@ int main(int argc, char *argv[])
 {
     std::string path = getExeFolder(argv[0]);
     std::string imgPath = saveTodayPhoto("it-IT", path);
-    std::cout << "path" << imgPath<< std::endl;
     if(!(imgPath == "")){
-        std::cout << setPhoto(imgPath) << std::endl;
+        setPhoto(imgPath);
     }
     app = new QApplication(argc, argv);
     app->setQuitOnLastWindowClosed(false);
 
     // Create the system tray icon
-    QSystemTrayIcon trayIcon = QIcon::fromTheme(QIcon::ThemeIcon::EditUndo);;
+    QSystemTrayIcon trayIcon = QIcon::fromTheme(QIcon::ThemeIcon::EditUndo);
 
     // Create a menu for the tray icon
     QMenu trayMenu;
@@ -69,7 +69,8 @@ int main(int argc, char *argv[])
     trayIcon.show();
     launchWindow();
 
-
-    app->exec();
-    return 0;
+    QTimer::singleShot(0, []{
+        std::cout <<"print"<<std::endl;
+    });
+    return app->exec();
 }
