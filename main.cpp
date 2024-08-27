@@ -3,6 +3,7 @@
 #include <QApplication>
 #include <QCoreApplication>
 #include <QPushButton>
+#include "bing_wallpaper.h"
 
 QMainWindow *mainWindow;
 QApplication *app;
@@ -26,9 +27,29 @@ void onTrayIconActivated(QSystemTrayIcon::ActivationReason reason) {
         launchWindow();
     }
 }
+std::string getExeFolder(char* exePath){
+    int index = -1;
+    std::string path = exePath;
+    for(int i = strlen(exePath) - 1; i >= 0; i--){
+        if(exePath[i] == '\\' || exePath[i] == '/'){
+            index = i;
+            break;
+        }
+    }
+    if(index != -1){
+        return path.substr(0,index+1);
+    }
+    return "/";
+}
 
 int main(int argc, char *argv[])
 {
+    std::string path = getExeFolder(argv[0]);
+    std::string imgPath = saveTodayPhoto("fr-FR", path);
+    std::cout << "path" << imgPath<< std::endl;
+    if(!(imgPath == "")){
+        std::cout << setPhoto(imgPath) << std::endl;
+    }
     app = new QApplication(argc, argv);
     app->setQuitOnLastWindowClosed(false);
 
