@@ -7,6 +7,7 @@
 #include <sys/types.h>
  #include <QJsonDocument>
 #include <iostream>
+#include <filesystem>
 
 using namespace std;
 
@@ -57,6 +58,17 @@ string getBingNewImg(QString longRegion, QString date, QString path){
             {"Italy", "it-IT"},
             {"Brazil", "pt-BR"}};
     string region = regions[longRegion];
+    struct stat sta;
+    date = "-1";
+    if(stat( (path + "images/bing").toStdString().c_str(), &sta) == 0){
+        for (const auto & entry : std::filesystem::directory_iterator((path + "images/bing").toStdString())){
+            string fileDate = entry.path().filename().string().substr(0, 8);
+            if((fileDate < date.toStdString() || date == "-1") && entry.path().filename().string().find(region) != std::string::npos){
+                date = QString::fromStdString(fileDate);
+            }
+        }
+    }
+
     curl_global_init(CURL_GLOBAL_ALL);
     CURL *curl_handle = curl_easy_init();
     CURLcode res;
@@ -64,7 +76,7 @@ string getBingNewImg(QString longRegion, QString date, QString path){
     chunk.memory = (char*)malloc(1); /* grown as needed by the realloc above */
     chunk.memory[0] = (char)0;
     chunk.size = 0;
-    string jsonURL = "https://www.bing.com/HPImageArchive.aspx?format=js&idx=6&n=1&mkt=";
+    string jsonURL = "https://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&mkt=";
     //Add in the region to our request
     string jsonURLRegion = jsonURL + region;
 

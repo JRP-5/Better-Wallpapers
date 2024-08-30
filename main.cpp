@@ -7,6 +7,7 @@
 #include "wallpaper_utils.h"
 #include <QThread>
 #include <iostream>
+#include "unsplash.h"
 
 QMainWindow *mainWindow;
 QApplication *app;
@@ -49,6 +50,7 @@ std::string getExeFolder(char* exePath){
 
 int main(int argc, char *argv[]){
     std::string path = getExeFolder(argv[0]);
+    getUnsplashNewImg("-1", QString::fromStdString(path));
     QString s = QString::fromStdString(path);
     options = getJsonFromPath(s);
 

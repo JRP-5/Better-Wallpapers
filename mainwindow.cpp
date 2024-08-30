@@ -48,11 +48,16 @@ MainWindow::MainWindow(QWidget *parent, WallpaperOptions *wallpaperOptions)
     connect(regionChoice, &QComboBox::currentTextChanged, this, &MainWindow::bingRegionChanged);
     regionLayout->addWidget(regionChoice, 0, Qt::AlignCenter);
 
+
     // Create a widget to contain our layout
     QWidget *window = new QWidget(this);
     window->setLayout(container);
     // Add the widget to the window
     this->setCentralWidget(window);
+
+    combo->setCurrentIndex(commands.indexOf(options->potdSource));
+    regionChoice->setCurrentIndex(regions.indexOf(options->bingRegion));
+
 }
 
 
