@@ -49,7 +49,7 @@ std::string getExeFolder(char* exePath){
 
 int main(int argc, char *argv[]){
     std::string path = getExeFolder(argv[0]);
-    QString s = QString::fromStdString(path + "options.json");
+    QString s = QString::fromStdString(path);
     options = getJsonFromPath(s);
 
     app = new QApplication(argc, argv);
@@ -74,7 +74,7 @@ int main(int argc, char *argv[]){
     launchWindow(options);
 
 
-    QThread *thread = QThread::create([path]() { wallpaper_loop(options, path); });
+    QThread *thread = QThread::create([]() { wallpaper_loop(options); });
     thread->start();
     int result = app->exec();
     thread->exit();

@@ -5,7 +5,7 @@
 #include <QComboBox>
 #include <QBoxLayout>
 #include <QLabel>
-
+#include <iostream>
 
 
 MainWindow::MainWindow(QWidget *parent, WallpaperOptions *wallpaperOptions)
@@ -61,6 +61,7 @@ void MainWindow::sourceChanged(const QString& newSource)
     if (this->options) { // Check if options is not null
         this->options->potdSource = newSource;
         this->options->saveJson();
+        checkForNewImg(this->options, "-1");
     }
     // If user has selected bing
     bool shouldShow = 0;
@@ -80,6 +81,9 @@ void MainWindow::bingRegionChanged(const QString& newRegion){
     if (this->options) { // Check if options is not null
         this->options->bingRegion = newRegion;
         this->options->saveJson();
+
+        checkForNewImg(this->options, "-1");
+
     }
 }
 

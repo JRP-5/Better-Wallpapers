@@ -3,6 +3,6 @@
 
 #include <string>
 #include <QString>
-std::string getBingNewImg(QString region, QString date, std::string path);
+std::string getBingNewImg(QString region, QString date, QString path);
 int setPhoto(std::string imgPath);
 #endif // BING_WALLPAPER_H

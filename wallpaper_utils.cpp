@@ -9,8 +9,8 @@
 #include "wallpaper_utils.h"
 #include "bing_wallpaper.h"
 #include <curl/curl.h>
-
-
+#include <sys/types.h>
+#include <sys/stat.h>
 
 using namespace std;
 namespace fs = std::filesystem;
@@ -42,13 +42,17 @@ int setPhoto(string imgPath){
     return SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, (void *)wideImgPath.c_str(), SPIF_UPDATEINIFILE);
 }
 // Checks for a new image from the given source and sets and saves it if a new one is found
-string checkForNewImg(WallpaperOptions *options, string path, QString date){
+string checkForNewImg(WallpaperOptions *options, QString date){
 
     if(options->potdSource == "Bing"){
-        string imgPath = getNewImg(options->bingRegion, date, path);
+        string imgPath = getBingNewImg(options->bingRegion, date, options->jsonPath);
+
         if(imgPath != ""){
             setPhoto(imgPath);
         }
+    }
+    else if(options->potdSource == "Unslpash"){
+
     }
     return "";
 }
@@ -60,7 +64,7 @@ void WallpaperOptions::saveJson(){
     json["changed"] = changed;
     QJsonDocument jsonDoc(json);
 
-    QFile file(jsonPath);
+    QFile file(jsonPath + "options.json");
     // If we can read the file
     if (file.open(QIODevice::WriteOnly)) {
         file.write(jsonDoc.toJson());
@@ -71,7 +75,7 @@ void WallpaperOptions::saveJson(){
 //Method to initialize the struct from a path to the json file
 WallpaperOptions* getJsonFromPath(const QString &path) {
     WallpaperOptions *data = new WallpaperOptions;
-    QFile file(path);
+    QFile file(path + "options.json");
     if (!file.open(QIODevice::ReadOnly)) {
         data->jsonPath = path; // Return a default WallpaperData object
     }
@@ -87,17 +91,21 @@ WallpaperOptions* getJsonFromPath(const QString &path) {
     file.close();
     return data;
 }
-void wallpaper_loop(WallpaperOptions *options, string path){
+void wallpaper_loop(WallpaperOptions *options){
     while(1){
         // Finding the latest date for which we have a picture
         QString latestDate = "-1";
-        for (const auto & entry : fs::directory_iterator(path + "images/" + options->potdSource.toStdString())){
-            string fileDate = entry.path().filename().string().substr(0, 8);
-            if(fileDate < latestDate.toStdString() || latestDate == "-1"){
-                latestDate = QString::fromStdString(fileDate);
+        struct stat st;
+        if(stat( (options->jsonPath + "images/" + options->potdSource).toStdString().c_str(), &st) == 0){
+            for (const auto & entry : fs::directory_iterator((options->jsonPath + "images/" + options->potdSource).toStdString())){
+                string fileDate = entry.path().filename().string().substr(0, 8);
+                if(fileDate < latestDate.toStdString() || latestDate == "-1"){
+                    latestDate = QString::fromStdString(fileDate);
+                }
             }
+            checkForNewImg(options, latestDate);
         }
-        checkForNewImg(options, path, latestDate);
+
         QThread::sleep(5);
     }
 }

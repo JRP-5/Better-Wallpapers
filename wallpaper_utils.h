@@ -10,7 +10,7 @@ struct WallpaperOptions {
     QString jsonPath;
     void saveJson();
 };
-std::string checkForNewImg(WallpaperOptions *options, std::string path, QString date);
+std::string checkForNewImg(WallpaperOptions *options, QString date);
 WallpaperOptions* getJsonFromPath(const QString &jsonPath);
-void wallpaper_loop(WallpaperOptions *options, std::string path);
+void wallpaper_loop(WallpaperOptions *options);
 #endif // WALLPAPER_UTILS_H

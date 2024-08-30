@@ -43,7 +43,20 @@ static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, voi
     return realsize;
 }
 // Function to get the url of the new image given current most recent one, if a new one is needed
-string getBingNewImg(QString region, QString date, string path){
+string getBingNewImg(QString longRegion, QString date, QString path){
+    map<QString, string> regions{ { "USA","en-US"},
+            {"Great Britain", "en-GB"},
+            {"China", "zh-CN"},
+            {"Japan", "ja-JP"},
+            {"Canada", "en-CA"},
+            {"Australia", "en-AU"},
+            {"New Zealand", "en-NZ"},
+            {"Germany", "de-DE"},
+            {"Spain", "es-ES"},
+            {"France", "fr-FR"},
+            {"Italy", "it-IT"},
+            {"Brazil", "pt-BR"}};
+    string region = regions[longRegion];
     curl_global_init(CURL_GLOBAL_ALL);
     CURL *curl_handle = curl_easy_init();
     CURLcode res;
@@ -51,18 +64,18 @@ string getBingNewImg(QString region, QString date, string path){
     chunk.memory = (char*)malloc(1); /* grown as needed by the realloc above */
     chunk.memory[0] = (char)0;
     chunk.size = 0;
-    string jsonURL = "https://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&mkt=";
+    string jsonURL = "https://www.bing.com/HPImageArchive.aspx?format=js&idx=6&n=1&mkt=";
     //Add in the region to our request
-    string jsonURLRegion = jsonURL + region.toStdString();
+    string jsonURLRegion = jsonURL + region;
 
     curl_easy_setopt(curl_handle, CURLOPT_URL, jsonURLRegion.c_str());
     /* disable progress meter, set to 0L to enable it */
     curl_easy_setopt(curl_handle, CURLOPT_NOPROGRESS, 1L);
-    curl_easy_setopt(curl_handle, CURLOPT_CAINFO, (path + "curl-ca-bundle.crt").c_str());
+    curl_easy_setopt(curl_handle, CURLOPT_CAINFO, (path + "curl-ca-bundle.crt").toStdString().c_str());
     /* send all data to this function  */
     curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
     curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, (void *)&chunk);
-    curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, (path + "libcurl-agent/1.0").c_str());
+    curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, (path + "libcurl-agent/1.0").toStdString().c_str());
     curl_easy_perform(curl_handle);
 
 
@@ -93,19 +106,19 @@ string getBingNewImg(QString region, QString date, string path){
     curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, write_data);
 
     // Get the image path includin the bing directory
-    QString imagesBing = QString::fromStdString(path + "images/bing/");
+    QString imagesBing = path + "images/bing/";
 
-    QString pageFileName = imagesBing + imgDate + region + ".jpg";
+    QString pageFileName = imagesBing + imgDate + QString::fromStdString(region) + ".jpg";
     // Now we'll store the image
 
     // If bing directory doesn't exist create it
     struct stat st;
-    if(stat( (path + "images/bing").c_str(), &st) == -1) {
+    if(stat( (path + "images/bing").toStdString().c_str(), &st) == -1) {
         //Check if images exists
-        if(stat((path + "images").c_str(),&st) == -1){
-            mkdir((path + "images").c_str());
+        if(stat((path + "images").toStdString().c_str(),&st) == -1){
+            mkdir((path + "images").toStdString().c_str());
         }
-        mkdir((path + "images/bing").c_str());
+        mkdir((path + "images/bing").toStdString().c_str());
     }
     /* open the file */
     FILE *pagefile = fopen(pageFileName.toStdString().c_str(), "wb");
