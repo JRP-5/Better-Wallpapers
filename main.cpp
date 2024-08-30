@@ -5,13 +5,15 @@
 #include "bing_wallpaper.h"
 #include <QTimer>
 #include "wallpaper_utils.h"
+#include <QThread>
 #include <iostream>
 
 QMainWindow *mainWindow;
 QApplication *app;
+WallpaperOptions *options;
 //Function to launch the settings window
-void launchWindow(){
-    mainWindow = new MainWindow();
+void launchWindow(WallpaperOptions *options){
+    mainWindow = new MainWindow(0, options);
     mainWindow->resize(500, 500);
     mainWindow->show();
     // Create a button to compltely close the application
@@ -26,7 +28,7 @@ void launchWindow(){
 void onTrayIconActivated(QSystemTrayIcon::ActivationReason reason) {
     // Check if the activation reason is a left-click
     if (reason == QSystemTrayIcon::Trigger) {
-        launchWindow();
+        launchWindow(options);
     }
 }
 
@@ -45,14 +47,17 @@ std::string getExeFolder(char* exePath){
     return "/";
 }
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]){
     std::string path = getExeFolder(argv[0]);
     std::string imgPath = saveTodayPhoto("it-IT", path);
     if(!(imgPath == "")){
         setPhoto(imgPath);
     }
+    QString s = QString::fromStdString(path + "options.json");
+    options = getJsonFromPath(s);
+
     app = new QApplication(argc, argv);
+    // Make sure the application doesn't quit when we close the settings window
     app->setQuitOnLastWindowClosed(false);
 
     // Create the system tray icon
@@ -69,9 +74,14 @@ int main(int argc, char *argv[])
     QObject::connect(&trayIcon,  &QSystemTrayIcon::activated, app, &onTrayIconActivated);
     // Show the tray icon
     trayIcon.show();
-    launchWindow();
+    options->saveJson();
+    launchWindow(options);
 
-    QThread *thread = QThread::create(&wallpaper_loop);
+
+
+    QThread *thread = QThread::create([]() { wallpaper_loop(options); });
     thread->start();
-    return app->exec();
+    int result = app->exec();
+    thread->exit();
+    return result;
 }

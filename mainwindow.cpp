@@ -2,16 +2,16 @@
 #include <QCoreApplication>
 #include <QMessageBox>
 #include <QDebug>
-#include <iostream>
 #include <QComboBox>
 #include <QBoxLayout>
 #include <QLabel>
 
 
 
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(QWidget *parent, WallpaperOptions *wallpaperOptions)
     : QMainWindow(parent)
 {
+    this->options = wallpaperOptions;
     // Create the main layour container
     QVBoxLayout *container = new QVBoxLayout();
     //Create the layout to store the wallpaper source
@@ -28,9 +28,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect( combo, &QComboBox::currentTextChanged, this, &MainWindow::sourceChanged);
     //Add it to the layout
     sourceLayout->addWidget(combo, 0, Qt::AlignCenter);
-
-    // Set the current POTD source
-    this->sourceChanged(commands[0]);
 
 
     // Create a region selection for bing region
@@ -50,10 +47,6 @@ MainWindow::MainWindow(QWidget *parent)
     regionChoice->addItems(regions);
     connect(regionChoice, &QComboBox::currentTextChanged, this, &MainWindow::bingRegionChanged);
     regionLayout->addWidget(regionChoice, 0, Qt::AlignCenter);
-    //Set the default region
-    this->bingRegionChanged(regions[0]);
-
-
 
     // Create a widget to contain our layout
     QWidget *window = new QWidget(this);
@@ -65,7 +58,9 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::sourceChanged(const QString& newSource)
 {
-    this->potdSource = newSource;
+    if (this->options) { // Check if options is not null
+        this->options->potdSource = newSource;
+    }
     // If user has selected bing
     bool shouldShow = 0;
     if(newSource.compare("Bing") == 0){
@@ -80,12 +75,9 @@ void MainWindow::sourceChanged(const QString& newSource)
         }
     }
 }
-QString MainWindow::getPOTDSource(){
-    return this->potdSource;
-}
 void MainWindow::bingRegionChanged(const QString& newRegion){
-    this->bingRegion = newRegion;
+    if (this->options) { // Check if options is not null
+        this->options->bingRegion = newRegion;
+    }
 }
-QString MainWindow::getBingRegion(){
-    return this->bingRegion;
-}
+
