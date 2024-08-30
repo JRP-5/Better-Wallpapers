@@ -2,7 +2,7 @@
 #define BING_WALLPAPER_H
 
 #include <string>
-std::string saveTodayPhoto(std::string region, std::string path);
+#include <QString>
+std::string getBingNewImg(QString region, QString date, std::string path);
 int setPhoto(std::string imgPath);
-void wallpaperLoop(struct wallpaperOption *options);
 #endif // BING_WALLPAPER_H

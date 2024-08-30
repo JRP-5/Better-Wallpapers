@@ -34,6 +34,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         ${PROJECT_SOURCES}
 
         main.cpp
+        unsplash.h unsplash.cpp
 
 
 

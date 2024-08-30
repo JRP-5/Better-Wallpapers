@@ -6,6 +6,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
  #include <QJsonDocument>
+#include <iostream>
 
 using namespace std;
 
@@ -41,10 +42,8 @@ static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, voi
 
     return realsize;
 }
-
-// Function to save bing's photo for today from the given region to images/bing
-string saveTodayPhoto(string region, string path)
-{
+// Function to get the url of the new image given current most recent one, if a new one is needed
+string getBingNewImg(QString region, QString date, string path){
     curl_global_init(CURL_GLOBAL_ALL);
     CURL *curl_handle = curl_easy_init();
     CURLcode res;
@@ -54,7 +53,7 @@ string saveTodayPhoto(string region, string path)
     chunk.size = 0;
     string jsonURL = "https://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&mkt=";
     //Add in the region to our request
-    string jsonURLRegion = jsonURL + region;
+    string jsonURLRegion = jsonURL + region.toStdString();
 
     curl_easy_setopt(curl_handle, CURLOPT_URL, jsonURLRegion.c_str());
     /* disable progress meter, set to 0L to enable it */
@@ -64,13 +63,22 @@ string saveTodayPhoto(string region, string path)
     curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
     curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, (void *)&chunk);
     curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, (path + "libcurl-agent/1.0").c_str());
-    res = curl_easy_perform(curl_handle);
+    curl_easy_perform(curl_handle);
+
+
 
     QJsonDocument data = QJsonDocument::fromJson(QString(chunk.memory).toUtf8());
     if(data.isNull()){
+        curl_easy_cleanup(curl_handle);
+        curl_global_cleanup();
         return "";
     }
-    // TODO get url from json
+    QString imgDate =  data["images"][0]["startdate"].toString();
+    if(imgDate.compare(date) <= 0){
+        curl_easy_cleanup(curl_handle);
+        curl_global_cleanup();
+        return "";
+    }
     QString url = data["images"][0]["url"].toString();
 
     // Get the UHD version of the URL by replaceing the 1920x1080 with UHD
@@ -83,11 +91,11 @@ string saveTodayPhoto(string region, string path)
     curl_easy_setopt(curl_handle, CURLOPT_URL, fullUHDurl.toStdString().c_str());
     /* send all data to this function  */
     curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, write_data);
-    QString imgDate =  data["images"][0]["startdate"].toString();
 
+    // Get the image path includin the bing directory
     QString imagesBing = QString::fromStdString(path + "images/bing/");
 
-    QString pageFileName = imagesBing + imgDate + QString::fromStdString(region) + ".jpg";
+    QString pageFileName = imagesBing + imgDate + region + ".jpg";
     // Now we'll store the image
 
     // If bing directory doesn't exist create it
@@ -115,11 +123,8 @@ string saveTodayPhoto(string region, string path)
     curl_easy_cleanup(curl_handle);
     curl_global_cleanup();
     return pageFileName.toStdString();
+
+
 }
-// Sets the wallpaper to the image given in the path
-// Windows specific
-int setPhoto(string imgPath){
-    std::wstring wideImgPath = std::wstring(imgPath.begin(), imgPath.end());
-    return SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, (void *)wideImgPath.c_str(), SPIF_UPDATEINIFILE);
-}
+
 

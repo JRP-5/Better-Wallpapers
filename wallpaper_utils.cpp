@@ -7,6 +7,10 @@
 #include <QObject>
 #include <iostream>
 #include "wallpaper_utils.h"
+#include "bing_wallpaper.h"
+#include <curl/curl.h>
+
+
 
 using namespace std;
 namespace fs = std::filesystem;
@@ -31,17 +35,25 @@ void deleteOldImgs(string path, int days){
         }
     }
 }
-// struct WallpaperOptions {
-//     QString potdSource = "Bing";
-//     QString bingRegion = "USA";
-//     bool changed = false;
-//     QString jsonPath;
+// Sets the wallpaper to the image given in the path
+// Windows specific
+int setPhoto(string imgPath){
+    std::wstring wideImgPath = std::wstring(imgPath.begin(), imgPath.end());
+    return SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, (void *)wideImgPath.c_str(), SPIF_UPDATEINIFILE);
+}
+// Checks for a new image from the given source and sets and saves it if a new one is found
+string checkForNewImg(WallpaperOptions *options, string path, QString date){
 
-// };
-
+    if(options->potdSource == "Bing"){
+        string imgPath = getNewImg(options->bingRegion, date, path);
+        if(imgPath != ""){
+            setPhoto(imgPath);
+        }
+    }
+    return "";
+}
 void WallpaperOptions::saveJson(){
     // Make our json object to be saved
-    qDebug() << jsonPath ;
     QJsonObject json;
     json["potdSource"] = potdSource;
     json["bingRegion"] = bingRegion;
@@ -62,7 +74,6 @@ WallpaperOptions* getJsonFromPath(const QString &path) {
     QFile file(path);
     if (!file.open(QIODevice::ReadOnly)) {
         data->jsonPath = path; // Return a default WallpaperData object
-        cout << "ehre" << endl;
     }
     else{
         QJsonObject json = QJsonDocument().fromJson(file.readAll()).object();
@@ -76,9 +87,17 @@ WallpaperOptions* getJsonFromPath(const QString &path) {
     file.close();
     return data;
 }
-void wallpaper_loop(WallpaperOptions *options){
+void wallpaper_loop(WallpaperOptions *options, string path){
     while(1){
-
+        // Finding the latest date for which we have a picture
+        QString latestDate = "-1";
+        for (const auto & entry : fs::directory_iterator(path + "images/" + options->potdSource.toStdString())){
+            string fileDate = entry.path().filename().string().substr(0, 8);
+            if(fileDate < latestDate.toStdString() || latestDate == "-1"){
+                latestDate = QString::fromStdString(fileDate);
+            }
+        }
+        checkForNewImg(options, path, latestDate);
         QThread::sleep(5);
     }
 }

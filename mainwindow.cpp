@@ -22,7 +22,7 @@ MainWindow::MainWindow(QWidget *parent, WallpaperOptions *wallpaperOptions)
     QLabel *label = new QLabel("Picture of the day source");
     sourceLayout->addWidget(label, 0, Qt::AlignCenter);
     // Picture of the day drop down
-    QStringList commands = { "Bing", "Wikimedia", "Nasa Earth Observatory", "Nasa" };
+    QStringList commands = { "Bing", "Unsplash", "Nasa" };
     QComboBox* combo = new QComboBox();
     combo->addItems(commands);
     connect( combo, &QComboBox::currentTextChanged, this, &MainWindow::sourceChanged);
@@ -60,6 +60,7 @@ void MainWindow::sourceChanged(const QString& newSource)
 {
     if (this->options) { // Check if options is not null
         this->options->potdSource = newSource;
+        this->options->saveJson();
     }
     // If user has selected bing
     bool shouldShow = 0;
@@ -78,6 +79,7 @@ void MainWindow::sourceChanged(const QString& newSource)
 void MainWindow::bingRegionChanged(const QString& newRegion){
     if (this->options) { // Check if options is not null
         this->options->bingRegion = newRegion;
+        this->options->saveJson();
     }
 }
 
