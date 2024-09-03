@@ -112,9 +112,9 @@ void wallpaper_loop(WallpaperOptions *options){
                     latestDate = QString::fromStdString(fileDate);
                 }
             }
-            checkForNewImg(options, latestDate);
-        }
 
+        }
+        checkForNewImg(options, latestDate);
         QThread::sleep(5);
     }
 }

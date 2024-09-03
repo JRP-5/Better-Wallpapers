@@ -104,7 +104,6 @@ std::string getUnsplashNewImg(QString latestDate, QString path){
         counter++;
     }
     URL[urlCounter] = (char)0;
-    std::cout << URL << std::endl;
 
     //Now we have the URL download the image
     /* specify URL to get */
@@ -113,18 +112,18 @@ std::string getUnsplashNewImg(QString latestDate, QString path){
     // Allow redirects
     curl_easy_setopt(curl_handle, CURLOPT_FOLLOWLOCATION , 1);
     // Generate the path to the image + it's name
-    QString filePath = path + "images/unslpash/" + getCurrentDate() + ".jpg";
+    QString filePath = path + "images/unsplash/" + getCurrentDate() + ".jpg";
 
     // Now we'll store the image
 
     // If unsplash directory doesn't exist create it
     struct stat st;
-    if(stat( (path + "images/unslpash").toStdString().c_str(), &st) == -1) {
+    if(stat( (path + "images/unsplash").toStdString().c_str(), &st) == -1) {
         //Check if images exists
         if(stat((path + "images").toStdString().c_str(),&st) == -1){
             mkdir((path + "images").toStdString().c_str());
         }
-        mkdir((path + "images/unslpash").toStdString().c_str());
+        mkdir((path + "images/unsplash").toStdString().c_str());
     }
     /* open the file */
     FILE *pagefile = fopen(filePath.toStdString().c_str(), "wb");

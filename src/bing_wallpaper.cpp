@@ -59,14 +59,16 @@ string getBingNewImg(QString longRegion, QString date, QString path){
             {"Brazil", "pt-BR"}};
     string region = regions[longRegion];
     struct stat sta;
-    date = "-1";
+
     // Getting the newest picture date from the current region
-    if(stat( (path + "images/bing").toStdString().c_str(), &sta) == 0){
+    // If the date is -1 we need to change the wallpaper regardless
+    if(stat( (path + "images/bing").toStdString().c_str(), &sta) == 0 && date != "-1"){
+        date = "0";
         // Iterate through every image in the directory
         for (const auto & entry : std::filesystem::directory_iterator((path + "images/bing").toStdString())){
             string fileDate = entry.path().filename().string().substr(0, 8);
             // If the date is more than the latest date change the latest date to it
-            if((fileDate > date.toStdString() || date == "-1") && entry.path().filename().string().find(region) != std::string::npos){
+            if((fileDate > date.toStdString() || date == "0") && entry.path().filename().string().find(region) != std::string::npos){
                 date = QString::fromStdString(fileDate);
             }
         }
