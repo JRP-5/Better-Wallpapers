@@ -166,3 +166,21 @@ bool addShortcutToStartup(std::wstring exePath){
     }
     return hres;
 }
+bool deleteShortcutInStartupFolder()
+{
+    wchar_t szPath[MAX_PATH];
+    if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_STARTUP, NULL, 0, szPath)))
+    {
+        // Generate the shortcut's path
+        std::wstring shortcutPath = std::wstring(szPath) + L"\\BetterWallpapers.lnk";
+
+        // Check if the file exists.
+        if (GetFileAttributes(shortcutPath.c_str()) != INVALID_FILE_ATTRIBUTES)
+        {
+            // Delete the shortcut file.
+            return DeleteFile(shortcutPath.c_str()) != 0;
+        }
+    }
+    qDebug() << "Failed to deleted shortcut";
+    return false;
+}

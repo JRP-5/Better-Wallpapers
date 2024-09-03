@@ -49,16 +49,16 @@ std::string getExeFolder(char* exePath){
 }
 
 int main(int argc, char *argv[]){
+    // Get the executables current path
     std::string path = getExeFolder(argv[0]);
+
     getUnsplashNewImg("-1", QString::fromStdString(path));
 
-    addShortcutToStartup(std::wstring(path.begin(), path.end()) + L"BetterWallpapers.exe");
-
-
-
+    // Read the user's options from options.json
     QString s = QString::fromStdString(path);
     options = getJsonFromPath(s);
 
+    // Create out Qapplication
     app = new QApplication(argc, argv);
     // Make sure the application doesn't quit when we close the settings window
     app->setQuitOnLastWindowClosed(false);
