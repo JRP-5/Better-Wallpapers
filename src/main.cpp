@@ -2,12 +2,10 @@
 #include <QApplication>
 #include <QCoreApplication>
 #include <QPushButton>
-#include "bing_wallpaper.h"
 #include <QTimer>
 #include "wallpaper_utils.h"
 #include <QThread>
 #include <iostream>
-#include "unsplash.h"
 #include "nasa.h"
 
 QMainWindow *mainWindow;
