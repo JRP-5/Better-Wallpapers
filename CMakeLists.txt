@@ -19,22 +19,23 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 find_package(CURL REQUIRED)
 
 set(PROJECT_SOURCES
-        main.cpp
-        mainwindow.cpp
-        mainwindow.h
-        bing_wallpaper.cpp
-        bing_wallpaper.h
-        wallpaper_utils.cpp
-        wallpaper_utils.h
+        src/main.cpp
+        src/mainwindow.cpp
+        src/mainwindow.h
+        src/bing_wallpaper.cpp
+        src/bing_wallpaper.h
+        src/wallpaper_utils.cpp
+        src/wallpaper_utils.h
+        src/unsplash.cpp
+        src/unsplash.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(BetterWallpapers
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
+        src/main.cpp
 
-        main.cpp
-        unsplash.h unsplash.cpp
 
 
 
