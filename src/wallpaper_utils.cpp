@@ -12,6 +12,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <shlobj.h>
+#include "unsplash.h"
 
 using namespace std;
 namespace fs = std::filesystem;
@@ -36,6 +37,15 @@ void deleteOldImgs(string path, int days){
         }
     }
 }
+// Gets the current date in the format YYYYMMDD
+QString getCurrentDate(){
+    time_t rawtime = time(0);
+    struct tm * timeinfo;
+    timeinfo = localtime(&rawtime);
+    char date[9];
+    strftime(date, sizeof(date), "%Y%m%d", timeinfo);
+    return QString(date);
+}
 // Sets the wallpaper to the image given in the path
 // Windows specific
 int setPhoto(string imgPath){
@@ -43,19 +53,18 @@ int setPhoto(string imgPath){
     return SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, (void *)wideImgPath.c_str(), SPIF_UPDATEINIFILE);
 }
 // Checks for a new image from the given source and sets and saves it if a new one is found
-string checkForNewImg(WallpaperOptions *options, QString date){
-
+void checkForNewImg(WallpaperOptions *options, QString date){
+    string imgPath = "";
     if(options->potdSource == "Bing"){
-        string imgPath = getBingNewImg(options->bingRegion, date, options->jsonPath);
-
-        if(imgPath != ""){
-            setPhoto(imgPath);
-        }
+        imgPath = getBingNewImg(options->bingRegion, date, options->jsonPath);
     }
-    else if(options->potdSource == "Unslpash"){
-
+    else if(options->potdSource == "Unsplash"){
+        imgPath = getUnsplashNewImg(date, options->jsonPath);
     }
-    return "";
+
+    if(imgPath != ""){
+        setPhoto(imgPath);
+    }
 }
 void WallpaperOptions::saveJson(){
     // Make our json object to be saved
@@ -88,7 +97,6 @@ WallpaperOptions* getJsonFromPath(const QString &path) {
         data->changed = json["changed"].toBool();
         data->jsonPath = path;
     }
-
     file.close();
     return data;
 }

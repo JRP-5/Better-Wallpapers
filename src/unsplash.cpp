@@ -2,12 +2,18 @@
 #include <QString>
 #include <curl/curl.h>
 #include <iostream>
+#include "wallpaper_utils.h"
+#include <sys/stat.h>
 
 struct MemoryStruct {
     char *memory;
     size_t size;
 };
-
+static size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream)
+{
+    size_t written = fwrite(ptr, size, nmemb, (FILE *)stream);
+    return written;
+}
 static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp)
 {
     size_t realsize = size * nmemb;
@@ -27,8 +33,12 @@ static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, voi
 
     return realsize;
 }
-
-std::string getUnsplashNewImg(QString date, QString path){
+// Function to download the latest unslpash image given the latest date of the current one
+std::string getUnsplashNewImg(QString latestDate, QString path){
+    // If we already have the latest image don't get a new one
+    if(getCurrentDate().compare(latestDate) <= 0){
+        return "";
+    }
     CURL *curl_handle;
     CURLcode res;
 
@@ -46,6 +56,7 @@ std::string getUnsplashNewImg(QString date, QString path){
     /* specify URL to get */
     curl_easy_setopt(curl_handle, CURLOPT_URL, "https://unsplash.com/collections/1459961/photo-of-the-day-(archive)");
 
+    /* Add a certificate */
     curl_easy_setopt(curl_handle, CURLOPT_CAINFO, (path + "curl-ca-bundle.crt").toStdString().c_str());
     /* send all data to this function  */
     curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
@@ -58,15 +69,78 @@ std::string getUnsplashNewImg(QString date, QString path){
 
     /* get it! */
     res = curl_easy_perform(curl_handle);
-    if(res == 0){
-        int pos = std::string(chunk.memory).find("Download this image");
-        char buff[5];
-        memcpy(buff, &chunk.memory[pos], 4);
-        buff[4] = (char)0;
-        //std::cout << buff << std::endl;
+    if(res != 0){
+        return "";
+    }
+    int pos = std::string(chunk.memory).find("Download this image");
+    // Search for href keyword
+    int hrefEnd = 0;
+    for(int i = pos + 19; i < pos + 19 + 200; i++){
+        if(chunk.memory[i] == 'h' && chunk.memory[i+1] == 'r' && chunk.memory[i+2] == 'e' && chunk.memory[i+3] == 'f'){
+            hrefEnd = i+4;
+        }
+    }
+    // Now get the href itself
+    bool found1 = false;
+    bool found2 = false;
+    int counter = hrefEnd;
+    int urlCounter = 0;
+    char URL[200];
+    while(!found2 && counter < hrefEnd + 200){
+        if(chunk.memory[counter] == '"'){
+            if(!found1){
+                found1 = true;
+                counter++;
+            }
+        }
+        if(chunk.memory[counter] == '?'){
+            found2 = true;
+            break;
+        }
+        if(found1){
+            URL[urlCounter] = chunk.memory[counter];
+            urlCounter++;
+        }
+        counter++;
+    }
+    URL[urlCounter] = (char)0;
+    std::cout << URL << std::endl;
+
+    //Now we have the URL download the image
+    /* specify URL to get */
+    curl_easy_setopt(curl_handle, CURLOPT_URL, URL);
+    curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, write_data);
+    // Allow redirects
+    curl_easy_setopt(curl_handle, CURLOPT_FOLLOWLOCATION , 1);
+    // Generate the path to the image + it's name
+    QString filePath = path + "images/unslpash/" + getCurrentDate() + ".jpg";
+
+    // Now we'll store the image
+
+    // If unsplash directory doesn't exist create it
+    struct stat st;
+    if(stat( (path + "images/unslpash").toStdString().c_str(), &st) == -1) {
+        //Check if images exists
+        if(stat((path + "images").toStdString().c_str(),&st) == -1){
+            mkdir((path + "images").toStdString().c_str());
+        }
+        mkdir((path + "images/unslpash").toStdString().c_str());
+    }
+    /* open the file */
+    FILE *pagefile = fopen(filePath.toStdString().c_str(), "wb");
+    if (pagefile)
+    {
+        /* write the page body to this file handle */
+        curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, pagefile);
+
+        /* get it! */
+        curl_easy_perform(curl_handle);
+
+        /* close the header file */
+        fclose(pagefile);
     }
 
     curl_easy_cleanup(curl_handle);
     curl_global_cleanup();
-    return "";
+    return filePath.toStdString();
 }

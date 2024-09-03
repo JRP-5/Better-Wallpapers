@@ -18,7 +18,7 @@ void launchWindow(WallpaperOptions *options){
     mainWindow->resize(500, 500);
     mainWindow->show();
     // Create a button to compltely close the application
-    QPushButton *closeButton = new QPushButton("Close Wallpaper changer", mainWindow);
+    QPushButton *closeButton = new QPushButton("Stop Wallpaper changer", mainWindow);
     closeButton->setFixedSize(180, 30);
     closeButton->setGeometry(10, 10, closeButton->width(), closeButton->height());
     closeButton->show();

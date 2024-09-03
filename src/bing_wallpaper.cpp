@@ -60,10 +60,13 @@ string getBingNewImg(QString longRegion, QString date, QString path){
     string region = regions[longRegion];
     struct stat sta;
     date = "-1";
+    // Getting the newest picture date from the current region
     if(stat( (path + "images/bing").toStdString().c_str(), &sta) == 0){
+        // Iterate through every image in the directory
         for (const auto & entry : std::filesystem::directory_iterator((path + "images/bing").toStdString())){
             string fileDate = entry.path().filename().string().substr(0, 8);
-            if((fileDate < date.toStdString() || date == "-1") && entry.path().filename().string().find(region) != std::string::npos){
+            // If the date is more than the latest date change the latest date to it
+            if((fileDate > date.toStdString() || date == "-1") && entry.path().filename().string().find(region) != std::string::npos){
                 date = QString::fromStdString(fileDate);
             }
         }
@@ -104,6 +107,7 @@ string getBingNewImg(QString longRegion, QString date, QString path){
         curl_global_cleanup();
         return "";
     }
+
     QString url = data["images"][0]["url"].toString();
 
     // Get the UHD version of the URL by replaceing the 1920x1080 with UHD
