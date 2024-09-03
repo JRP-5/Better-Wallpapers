@@ -13,6 +13,7 @@
 #include <sys/stat.h>
 #include <shlobj.h>
 #include "unsplash.h"
+#include "nasa.h"
 
 using namespace std;
 namespace fs = std::filesystem;
@@ -60,6 +61,9 @@ void checkForNewImg(WallpaperOptions *options, QString date){
     }
     else if(options->potdSource == "Unsplash"){
         imgPath = getUnsplashNewImg(date, options->jsonPath);
+    }
+    else if(options->potdSource == "Nasa"){
+        imgPath = getNasaNewImg(date, options->jsonPath);
     }
 
     if(imgPath != ""){

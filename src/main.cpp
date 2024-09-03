@@ -8,6 +8,7 @@
 #include <QThread>
 #include <iostream>
 #include "unsplash.h"
+#include "nasa.h"
 
 QMainWindow *mainWindow;
 QApplication *app;
@@ -52,7 +53,7 @@ int main(int argc, char *argv[]){
     // Get the executables current path
     std::string path = getExeFolder(argv[0]);
 
-    getUnsplashNewImg("-1", QString::fromStdString(path));
+    getNasaNewImg("-1", QString::fromStdString(path));
 
     // Read the user's options from options.json
     QString s = QString::fromStdString(path);

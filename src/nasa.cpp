@@ -1,9 +1,9 @@
-#include <string>
 #include <QString>
+#include <string>
 #include <curl/curl.h>
-#include <iostream>
 #include "wallpaper_utils.h"
 #include <sys/stat.h>
+#include <iostream>
 
 struct MemoryStruct {
     char *memory;
@@ -33,8 +33,8 @@ static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, voi
 
     return realsize;
 }
-// Function to download the latest unslpash image given the latest date of the current one
-std::string getUnsplashNewImg(QString latestDate, QString path){
+
+std::string getNasaNewImg(QString latestDate, QString path){
     // If we already have the latest image don't get a new one
     if(getCurrentDate().compare(latestDate) <= 0){
         return "";
@@ -54,7 +54,7 @@ std::string getUnsplashNewImg(QString latestDate, QString path){
     curl_handle = curl_easy_init();
 
     /* specify URL to get */
-    curl_easy_setopt(curl_handle, CURLOPT_URL, "https://unsplash.com/collections/1459961/photo-of-the-day-(archive)");
+    curl_easy_setopt(curl_handle, CURLOPT_URL, "https://www.nasa.gov/image-of-the-day/");
 
     /* Add a certificate */
     curl_easy_setopt(curl_handle, CURLOPT_CAINFO, (path + "curl-ca-bundle.crt").toStdString().c_str());
@@ -72,30 +72,31 @@ std::string getUnsplashNewImg(QString latestDate, QString path){
     if(res != 0){
         return "";
     }
-    int pos = std::string(chunk.memory).find("Download this image");
-    // Search for href keyword
-    int hrefEnd = 0;
-    for(int i = pos + 19; i < pos + 19 + 200; i++){
-        if(chunk.memory[i] == 'h' && chunk.memory[i+1] == 'r' && chunk.memory[i+2] == 'e' && chunk.memory[i+3] == 'f'){
-            hrefEnd = i+4;
+    int pos = std::string(chunk.memory).find("hds-gallery-item-single hds-gallery-image");
+    // std::string trimmed = std::string(chunk.memory).substr(pos, 600);
+    // free(chunk.memory);
+    // std::cout << trimmed << std::endl;
+    // Search for src attribute
+    int srcEnd = 0;
+    for(int i = pos + strlen("hds-gallery-item-single hds-gallery-image"); i < pos + 600; i++){
+        if(chunk.memory[i] == 's' && chunk.memory[i+1] == 'r' && chunk.memory[i+2] == 'c'){
+            srcEnd = i+3;
             break;
         }
     }
-    // Now get the href itself
+    // Now get the src itself
     bool found1 = false;
-    bool found2 = false;
-    int counter = hrefEnd;
+    int counter = srcEnd;
     int urlCounter = 0;
-    char URL[200];
-    while(!found2 && counter < hrefEnd + 200){
+    char URL[300];
+    while(counter < srcEnd + 300){
         if(chunk.memory[counter] == '"'){
             if(!found1){
                 found1 = true;
                 counter++;
             }
         }
-        if(chunk.memory[counter] == '?'){
-            found2 = true;
+        if(chunk.memory[counter] == '"'){
             break;
         }
         if(found1){
@@ -113,18 +114,18 @@ std::string getUnsplashNewImg(QString latestDate, QString path){
     // Allow redirects
     curl_easy_setopt(curl_handle, CURLOPT_FOLLOWLOCATION , 1);
     // Generate the path to the image + it's name
-    QString filePath = path + "images/unsplash/" + getCurrentDate() + ".jpg";
+    QString filePath = path + "images/nasa/" + getCurrentDate() + ".jpg";
 
     // Now we'll store the image
 
-    // If unsplash directory doesn't exist create it
+    // If nasa directory doesn't exist create it
     struct stat st;
-    if(stat( (path + "images/unsplash").toStdString().c_str(), &st) == -1) {
+    if(stat( (path + "images/nasa").toStdString().c_str(), &st) == -1) {
         //Check if images exists
         if(stat((path + "images").toStdString().c_str(),&st) == -1){
             mkdir((path + "images").toStdString().c_str());
         }
-        mkdir((path + "images/unsplash").toStdString().c_str());
+        mkdir((path + "images/nasa").toStdString().c_str());
     }
     /* open the file */
     FILE *pagefile = fopen(filePath.toStdString().c_str(), "wb");
@@ -144,3 +145,4 @@ std::string getUnsplashNewImg(QString latestDate, QString path){
     curl_global_cleanup();
     return filePath.toStdString();
 }
+
