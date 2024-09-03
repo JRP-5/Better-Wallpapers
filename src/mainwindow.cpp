@@ -6,6 +6,7 @@
 #include <QBoxLayout>
 #include <QLabel>
 #include <iostream>
+#include <QPushButton>
 
 
 MainWindow::MainWindow(QWidget *parent, WallpaperOptions *wallpaperOptions)
@@ -48,6 +49,14 @@ MainWindow::MainWindow(QWidget *parent, WallpaperOptions *wallpaperOptions)
     connect(regionChoice, &QComboBox::currentTextChanged, this, &MainWindow::bingRegionChanged);
     regionLayout->addWidget(regionChoice, 0, Qt::AlignCenter);
 
+    // Create a button to add the current wallpaper to favourites
+    QPushButton *favouriteButton = new QPushButton("Add Current Wallpaper\nto Favourites");
+    favouriteButton->setFixedSize(150, 50);
+    container->addWidget(favouriteButton, 0, Qt::AlignCenter);
+    favouriteButton->show();
+    QObject::connect(favouriteButton, &QPushButton::clicked, [](){
+        //TODO current Add to favourites
+    });
 
     // Create a widget to contain our layout
     QWidget *window = new QWidget(this);
