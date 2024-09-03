@@ -63,7 +63,7 @@ std::string getUnsplashNewImg(QString date, QString path){
         char buff[5];
         memcpy(buff, &chunk.memory[pos], 4);
         buff[4] = (char)0;
-        std::cout << buff << std::endl;
+        //std::cout << buff << std::endl;
     }
 
     curl_easy_cleanup(curl_handle);

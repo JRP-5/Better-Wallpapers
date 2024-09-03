@@ -11,6 +11,7 @@
 #include <curl/curl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <shlobj.h>
 
 using namespace std;
 namespace fs = std::filesystem;
@@ -108,4 +109,60 @@ void wallpaper_loop(WallpaperOptions *options){
 
         QThread::sleep(5);
     }
+}
+std::wstring GetStartupFolderPath(){
+    PWSTR pszPath;
+    HRESULT hr = SHGetKnownFolderPath(FOLDERID_Startup,
+                                      0,     // no special options required
+                                      NULL,  // no access token required
+                                      &pszPath);
+    if (SUCCEEDED(hr))
+    {
+        // The function succeeded, so copy the returned path to a
+        // C++ string, free the memory allocated by the function,
+        // and return the path string.
+        std::wstring path(pszPath);
+        CoTaskMemFree(static_cast<LPVOID>(pszPath));
+        return path;
+    }
+    else{
+        qDebug() << "Failed to location start up folder";
+        return std::wstring();
+    }
+}
+bool addShortcutToStartup(std::wstring exePath){
+    std::wstring startupPath = GetStartupFolderPath();
+    if(startupPath.empty()){
+        return false;
+    }
+    HRESULT hres;
+    IShellLink* psl;
+    // Initialize the COM library.
+    hres = CoInitialize(NULL);
+    if (FAILED(hres))
+    {
+        return false;
+    }
+    hres = CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, IID_IShellLink, (LPVOID*)&psl);
+    if (SUCCEEDED(hres)){
+        IPersistFile* ppf;
+
+        // Set the path to the shortcut target
+        psl->SetPath(exePath.c_str());
+
+        // Query IShellLink for the IPersistFile interface, used for saving the
+        // shortcut in persistent storage.
+        hres = psl->QueryInterface(IID_IPersistFile, (LPVOID*)&ppf);
+        if (SUCCEEDED(hres))
+        {
+            // Generate the shortcut's path
+            std::wstring shortcutExePath = std::wstring(startupPath) + L"\\BetterWallpapers.lnk";
+
+            // Save the link by calling IPersistFile::Save.
+            hres = ppf->Save(shortcutExePath.c_str(), TRUE);
+            ppf->Release();
+        }
+        psl->Release();
+    }
+    return hres;
 }

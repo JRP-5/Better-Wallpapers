@@ -51,6 +51,11 @@ std::string getExeFolder(char* exePath){
 int main(int argc, char *argv[]){
     std::string path = getExeFolder(argv[0]);
     getUnsplashNewImg("-1", QString::fromStdString(path));
+
+    addShortcutToStartup(std::wstring(path.begin(), path.end()) + L"BetterWallpapers.exe");
+
+
+
     QString s = QString::fromStdString(path);
     options = getJsonFromPath(s);
 
