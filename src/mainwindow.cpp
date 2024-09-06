@@ -7,13 +7,14 @@
 #include <QLabel>
 #include <iostream>
 #include <QPushButton>
+#include "wallpaper_utils.h"
 
 
 MainWindow::MainWindow(QWidget *parent, WallpaperOptions *wallpaperOptions)
     : QMainWindow(parent)
 {
     this->options = wallpaperOptions;
-    // Create the main layour container
+    // Create the main layout container
     QVBoxLayout *container = new QVBoxLayout();
     //Create the layout to store the wallpaper source
     QHBoxLayout *sourceLayout = new QHBoxLayout();
@@ -50,12 +51,30 @@ MainWindow::MainWindow(QWidget *parent, WallpaperOptions *wallpaperOptions)
     regionLayout->addWidget(regionChoice, 0, Qt::AlignCenter);
 
     // Create a button to add the current wallpaper to favourites
-    QPushButton *favouriteButton = new QPushButton("Add Current Wallpaper\nto Favourites");
+    QPushButton *favouriteButton = new QPushButton("Add Current Wallpaper\nto Favourites", this);
     favouriteButton->setFixedSize(150, 50);
     container->addWidget(favouriteButton, 0, Qt::AlignCenter);
     favouriteButton->show();
     QObject::connect(favouriteButton, &QPushButton::clicked, [](){
         //TODO current Add to favourites
+    });
+
+
+    // Create a button to toggle between running the app on startup and not
+    QPushButton *startupButton = new QPushButton("Run on startup");
+    startupButton->setStyleSheet("QPushButton{background-color:rgb(60, 179, 113);} ");
+    startupButton->setFixedSize(100, 40);
+    container->addWidget(startupButton, 0, Qt::AlignLeft);
+    //startupButton->show();
+    std::wstring exePath = this->options->jsonPath.toStdWString();
+    QObject::connect(startupButton, &QPushButton::clicked, [startupButton, exePath](){
+        bool isStartup = toggleShortcut(exePath);
+        if(isStartup){
+            startupButton->setStyleSheet("QPushButton{background-color:rgb(60, 179, 113);}");
+        }
+        else{
+            startupButton->setStyleSheet("QPushButton{background-color:rgb(245, 32, 32);}");
+        }
     });
 
     // Create a widget to contain our layout

@@ -4,6 +4,7 @@
 #include <iostream>
 #include "wallpaper_utils.h"
 #include <sys/stat.h>
+#include <QDebug>
 
 struct MemoryStruct {
     char *memory;

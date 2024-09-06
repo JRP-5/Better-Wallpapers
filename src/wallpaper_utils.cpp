@@ -75,7 +75,6 @@ void WallpaperOptions::saveJson(){
     QJsonObject json;
     json["potdSource"] = potdSource;
     json["bingRegion"] = bingRegion;
-    json["changed"] = changed;
     QJsonDocument jsonDoc(json);
 
     QFile file(jsonPath + "options.json");
@@ -98,7 +97,6 @@ WallpaperOptions* getJsonFromPath(const QString &path) {
         // Conver the Json object to a struct
         data->potdSource = json["potdSource"].toString();
         data->bingRegion = json["bingRegion"].toString();
-        data->changed = json["changed"].toBool();
         data->jsonPath = path;
     }
     file.close();
@@ -112,7 +110,7 @@ void wallpaper_loop(WallpaperOptions *options){
         if(stat( (options->jsonPath + "images/" + options->potdSource).toStdString().c_str(), &st) == 0){
             for (const auto & entry : fs::directory_iterator((options->jsonPath + "images/" + options->potdSource).toStdString())){
                 string fileDate = entry.path().filename().string().substr(0, 8);
-                if(fileDate < latestDate.toStdString() || latestDate == "-1"){
+                if(fileDate > latestDate.toStdString() || latestDate == "-1"){
                     latestDate = QString::fromStdString(fileDate);
                 }
             }
@@ -160,11 +158,13 @@ bool addShortcutToStartup(std::wstring exePath){
         IPersistFile* ppf;
 
         // Set the path to the shortcut target
-        psl->SetPath(exePath.c_str());
+        wchar_t exe[] = L"/BetterWallpapers.exe";
+        psl->SetPath((exePath + exe).c_str());
 
         // Query IShellLink for the IPersistFile interface, used for saving the
         // shortcut in persistent storage.
         hres = psl->QueryInterface(IID_IPersistFile, (LPVOID*)&ppf);
+        bool success = false;
         if (SUCCEEDED(hres))
         {
             // Generate the shortcut's path
@@ -173,11 +173,15 @@ bool addShortcutToStartup(std::wstring exePath){
             // Save the link by calling IPersistFile::Save.
             hres = ppf->Save(shortcutExePath.c_str(), TRUE);
             ppf->Release();
+            success = true;
         }
         psl->Release();
+        return success;
     }
     return hres;
 }
+// Function to delete the executable in the startup folder (if it exists)
+// Returns whether the executable is now in the startup folder
 bool deleteShortcutInStartupFolder()
 {
     wchar_t szPath[MAX_PATH];
@@ -190,9 +194,34 @@ bool deleteShortcutInStartupFolder()
         if (GetFileAttributes(shortcutPath.c_str()) != INVALID_FILE_ATTRIBUTES)
         {
             // Delete the shortcut file.
-            return DeleteFile(shortcutPath.c_str()) != 0;
+            return !(DeleteFile(shortcutPath.c_str()) != 0);
         }
     }
-    qDebug() << "Failed to deleted shortcut";
+    qDebug() << "Failed to find startup folder";
+    // If we can't find the startuop folder we assume our executable isn't in there
     return false;
+}
+// Function to toggle whether the executable exists in the startup folder
+// Returns whether the shortcut exists (true) or doesn't or can't access the folder(false)
+bool toggleShortcut(std::wstring exePath){
+    wchar_t szPath[MAX_PATH];
+    bool exists = false;
+    if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_STARTUP, NULL, 0, szPath)))
+    {
+        // Generate the shortcut's path
+        std::wstring shortcutPath = std::wstring(szPath) + L"\\BetterWallpapers.lnk";
+
+        // Check if the file exists.
+        exists = GetFileAttributes(shortcutPath.c_str()) != INVALID_FILE_ATTRIBUTES;
+    }
+    else{
+        qDebug() << "Failed to find startup folder";
+        return false;
+    }
+    if(exists){
+        return deleteShortcutInStartupFolder();
+    }
+    else{
+        return addShortcutToStartup(exePath);
+    }
 }

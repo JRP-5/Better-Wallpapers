@@ -134,7 +134,11 @@ string getBingNewImg(QString longRegion, QString date, QString path){
     curl_easy_setopt(curl_handle, CURLOPT_URL, fullUHDurl.toStdString().c_str());
     /* send all data to this function  */
     curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, write_data);
+    /* disable progress meter, set to 0L to enable it */
+    curl_easy_setopt(curl_handle, CURLOPT_NOPROGRESS, 1L);
+    curl_easy_setopt(curl_handle, CURLOPT_CAINFO, (path + "curl-ca-bundle.crt").toStdString().c_str());
 
+    curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, (path + "libcurl-agent/1.0").toStdString().c_str());
     // Get the image path includin the bing directory
     QString imagesBing = path + "images/bing/";
 

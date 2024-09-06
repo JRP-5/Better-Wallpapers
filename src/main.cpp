@@ -14,21 +14,30 @@ WallpaperOptions *options;
 //Function to launch the settings window
 void launchWindow(WallpaperOptions *options){
     mainWindow = new MainWindow(0, options);
+    mainWindow->setAttribute(Qt::WA_DeleteOnClose);
     mainWindow->resize(500, 500);
-    mainWindow->show();
+    QObject::connect(mainWindow, &QObject::destroyed, [](){
+        mainWindow = NULL;
+    });
     // Create a button to compltely close the application
     QPushButton *closeButton = new QPushButton("Stop Wallpaper changer", mainWindow);
     closeButton->setFixedSize(180, 30);
     closeButton->setGeometry(10, 10, closeButton->width(), closeButton->height());
     closeButton->show();
     QObject::connect(closeButton, &QPushButton::clicked, app, app->quit);
+    mainWindow->show();
 }
 
 // Function called when the system tray icon is left-clicked
 void onTrayIconActivated(QSystemTrayIcon::ActivationReason reason) {
     // Check if the activation reason is a left-click
     if (reason == QSystemTrayIcon::Trigger) {
-        launchWindow(options);
+
+        if(mainWindow == NULL){
+            launchWindow(options);
+            qDebug() << "NULL";
+        }
+
     }
 }
 
