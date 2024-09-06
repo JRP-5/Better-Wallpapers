@@ -25,7 +25,7 @@ MainWindow::MainWindow(QWidget *parent, WallpaperOptions *wallpaperOptions)
     QLabel *label = new QLabel("Picture of the day source");
     sourceLayout->addWidget(label, 0, Qt::AlignCenter);
     // Picture of the day drop down
-    QStringList commands = { "Bing", "Unsplash", "Nasa" };
+    QStringList commands = { "Bing", "Unsplash", "Nasa", "Random Favourite"};
     QComboBox* combo = new QComboBox();
     combo->addItems(commands);
     connect( combo, &QComboBox::currentTextChanged, this, &MainWindow::sourceChanged);

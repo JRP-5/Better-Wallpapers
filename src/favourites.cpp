@@ -8,7 +8,14 @@
 #include "nasa.h"
 #include "unsplash.h"
 #include "bing_wallpaper.h"
-#include <vector>
+#include <QRandomGenerator>
+#include <sys/stat.h>
+#include <curl/curl.h>
+static size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream)
+{
+    size_t written = fwrite(ptr, size, nmemb, (FILE *)stream);
+    return written;
+}
 
 std::string getFavouriteNewImg(QString path){
     QFile file(path + "favourites.json");
@@ -17,12 +24,62 @@ std::string getFavouriteNewImg(QString path){
         qDebug() << "Failed to read favourites files";
         return "";
     }
-    else{
-        QJsonObject json = QJsonDocument().fromJson(file.readAll()).object();
-    }
-    // TODO
+    QJsonDocument document = QJsonDocument().fromJson(file.readAll());
     file.close();
-    return "";
+    // If the file doesn't contain valid JSON and is not new return false
+    if (!document.isObject()) {
+        qDebug() << "favourites.json is not valid JSON";
+        return "";
+    }
+    QJsonObject json = document.object();
+    QJsonArray arr;
+    // Get the favourites array if it exists
+    if(json.contains("favourites") && json["favourites"].isArray()){
+        arr = json["favourites"].toArray();
+    }
+    if(arr.empty()){
+        return "";
+    }
+    // Now get a random element of the favourites array
+    int randInt = QRandomGenerator::global()->bounded(0, arr.size());
+    QString URL = arr[randInt].toString();
+    // Now we have the URL fetch the photo
+    curl_global_init(CURL_GLOBAL_ALL);
+    CURL *curl_handle = curl_easy_init();
+    curl_easy_setopt(curl_handle, CURLOPT_URL, URL.toStdString().c_str());
+    curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, write_data);
+    curl_easy_setopt(curl_handle, CURLOPT_NOPROGRESS, 1L);
+    curl_easy_setopt(curl_handle, CURLOPT_CAINFO, (path + "curl-ca-bundle.crt").toStdString().c_str());
+    curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, (path + "libcurl-agent/1.0").toStdString().c_str());
+    // Allow redirects
+    curl_easy_setopt(curl_handle, CURLOPT_FOLLOWLOCATION , 1);
+    // Call the file currentDateFav.jpg so we can delete it when it hasn't been used in a while
+    QString pageFileName = path + getCurrentDate() + ".jpg";
+    // Now we'll store the image
+
+    // If favourites directory doesn't exist create it
+    struct stat st;
+    if(stat( (path + "images/favourites").toStdString().c_str(), &st) == -1) {
+        //Check if images exists
+        if(stat((path + "images").toStdString().c_str(),&st) == -1){
+            mkdir((path + "images").toStdString().c_str());
+        }
+        mkdir((path + "images/favourites").toStdString().c_str());
+    }
+    /* open the file */
+    FILE *pagefile = fopen(pageFileName.toStdString().c_str(), "wb");
+    if (pagefile)
+    {
+        /* write the page body to this file handle */
+        curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, pagefile);
+        /* get it! */
+        curl_easy_perform(curl_handle);
+        /* close the header file */
+        fclose(pagefile);
+    }
+    curl_easy_cleanup(curl_handle);
+    curl_global_cleanup();
+    return pageFileName.toStdString();
 }
 // Function which saves the URL of the current picture to favourites.json
 bool favouriteCurrentImg(WallpaperOptions* options){

@@ -14,6 +14,7 @@
 #include <shlobj.h>
 #include "unsplash.h"
 #include "nasa.h"
+#include "favourites.h"
 
 using namespace std;
 namespace fs = std::filesystem;
@@ -64,6 +65,9 @@ void checkForNewImg(WallpaperOptions *options, QString date){
     }
     else if(options->potdSource == "Nasa"){
         imgPath = getNasaNewImg(date, options->jsonPath);
+    }
+    else if(options->potdSource == "Random Favourite"){
+        imgPath = getFavouriteNewImg(options->jsonPath);
     }
 
     if(imgPath != ""){
