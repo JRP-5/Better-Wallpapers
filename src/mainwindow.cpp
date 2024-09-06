@@ -8,6 +8,7 @@
 #include <iostream>
 #include <QPushButton>
 #include "wallpaper_utils.h"
+#include "favourites.h"
 
 
 MainWindow::MainWindow(QWidget *parent, WallpaperOptions *wallpaperOptions)
@@ -55,8 +56,8 @@ MainWindow::MainWindow(QWidget *parent, WallpaperOptions *wallpaperOptions)
     favouriteButton->setFixedSize(150, 50);
     container->addWidget(favouriteButton, 0, Qt::AlignCenter);
     favouriteButton->show();
-    QObject::connect(favouriteButton, &QPushButton::clicked, [](){
-        //TODO current Add to favourites
+    QObject::connect(favouriteButton, &QPushButton::clicked, [this](){
+        bool res = favouriteCurrentImg(this->options);
     });
 
 

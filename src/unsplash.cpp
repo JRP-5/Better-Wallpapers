@@ -98,6 +98,7 @@ QString getUnsplashURL(QString path){
         counter++;
     }
     URL[urlCounter] = (char)0;
+
     curl_easy_cleanup(curl_handle);
     curl_global_cleanup();
     return URL;

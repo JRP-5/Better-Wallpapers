@@ -3,5 +3,5 @@
 #include <iostream>
 #include <QString>
 std::string getUnsplashNewImg(QString date, QString path);
-std::string getUnsplashNewImg(QString latestDate, QString path);
+QString getUnsplashURL(QString path);
 #endif // UNSPLASH_H

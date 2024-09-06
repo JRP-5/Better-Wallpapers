@@ -44,7 +44,7 @@ static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, voi
     return realsize;
 }
 // Function to get the URL of the current bing image
-QString getBingURL(string region, QString path){
+QString getBingURL(QString region, QString path){
     curl_global_init(CURL_GLOBAL_ALL);
     CURL *curl_handle = curl_easy_init();
     CURLcode res;
@@ -52,11 +52,11 @@ QString getBingURL(string region, QString path){
     chunk.memory = (char*)malloc(1); /* grown as needed by the realloc above */
     chunk.memory[0] = (char)0;
     chunk.size = 0;
-    string jsonURL = "https://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&mkt=";
+    QString jsonURL = "https://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&mkt=";
     //Add in the region to our request
-    string jsonURLRegion = jsonURL + region;
+    QString jsonURLRegion = jsonURL + region;
 
-    curl_easy_setopt(curl_handle, CURLOPT_URL, jsonURLRegion.c_str());
+    curl_easy_setopt(curl_handle, CURLOPT_URL, jsonURLRegion.toStdString().c_str());
     /* disable progress meter, set to 0L to enable it */
     curl_easy_setopt(curl_handle, CURLOPT_NOPROGRESS, 1L);
     curl_easy_setopt(curl_handle, CURLOPT_CAINFO, (path + "curl-ca-bundle.crt").toStdString().c_str());
@@ -79,7 +79,7 @@ QString getBingURL(string region, QString path){
     QString uhdUrl = url.replace("1920x1080", "UHD");
     curl_easy_cleanup(curl_handle);
     curl_global_cleanup();
-    return uhdUrl;
+    return "https://www.bing.com" + uhdUrl;
 }
 // Function to get the new bing url (if needed) and it's date
 array<QString, 2> getBingNewURL(string region, QString date, QString path){

@@ -4,5 +4,5 @@
 #include <string>
 
 std::string getNasaNewImg(QString latestDate, QString path);
-
+QString getNasaURL(QString path);
 #endif // NASA_H

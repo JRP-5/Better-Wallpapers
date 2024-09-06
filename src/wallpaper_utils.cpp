@@ -91,13 +91,23 @@ WallpaperOptions* getJsonFromPath(const QString &path) {
     QFile file(path + "options.json");
     if (!file.open(QIODevice::ReadOnly)) {
         data->jsonPath = path; // Return a default WallpaperData object
+        qDebug() << "Unable to read options.json";
     }
     else{
-        QJsonObject json = QJsonDocument().fromJson(file.readAll()).object();
-        // Conver the Json object to a struct
-        data->potdSource = json["potdSource"].toString();
-        data->bingRegion = json["bingRegion"].toString();
-        data->jsonPath = path;
+
+        QJsonDocument document = QJsonDocument().fromJson(file.readAll());
+        // If the file doesn't contain valid JSON return false
+        if (!document.isObject()) {
+            qDebug() << "options.json is not valid JSON";
+            data->jsonPath = path;
+        }
+        else{
+            QJsonObject json = document.object();
+            // Convert the Json object to a struct
+            data->potdSource = json["potdSource"].toString();
+            data->bingRegion = json["bingRegion"].toString();
+            data->jsonPath = path;
+        }
     }
     file.close();
     return data;
