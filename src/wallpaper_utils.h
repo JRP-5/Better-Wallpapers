@@ -14,4 +14,5 @@ void checkForNewImg(WallpaperOptions *options, QString date);
 void wallpaper_loop(WallpaperOptions *options);
 QString getCurrentDate();
 bool toggleShortcut(std::wstring exePath);
+bool shortcutExists();
 #endif // WALLPAPER_UTILS_H

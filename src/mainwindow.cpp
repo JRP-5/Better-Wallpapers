@@ -62,7 +62,13 @@ MainWindow::MainWindow(QWidget *parent, WallpaperOptions *wallpaperOptions)
 
     // Create a button to toggle between running the app on startup and not
     QPushButton *startupButton = new QPushButton("Run on startup");
-    startupButton->setStyleSheet("QPushButton{background-color:rgb(60, 179, 113);} ");
+    // Set the colour of the button depending on whether the shortcut exists
+    if(shortcutExists()){
+        startupButton->setStyleSheet("QPushButton{background-color:rgb(60, 179, 113);}");
+    }
+    else{
+        startupButton->setStyleSheet("QPushButton{background-color:rgb(245, 32, 32);}");
+    }
     startupButton->setFixedSize(100, 40);
     container->addWidget(startupButton, 0, Qt::AlignLeft);
     //startupButton->show();

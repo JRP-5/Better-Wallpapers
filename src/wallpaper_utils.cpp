@@ -136,9 +136,25 @@ std::wstring GetStartupFolderPath(){
         return path;
     }
     else{
-        qDebug() << "Failed to location start up folder";
+        qDebug() << "Failed to locate startup folder";
         return std::wstring();
     }
+}
+bool shortcutExists(){
+    std::wstring startupPath = GetStartupFolderPath();
+    if(startupPath.empty()){
+        return false;
+    }
+    // Generate the shortcut's path
+    std::wstring shortcutPath = startupPath + L"\\BetterWallpapers.lnk";
+
+    // Check if the file exists.
+    if (GetFileAttributes(shortcutPath.c_str()) != INVALID_FILE_ATTRIBUTES)
+    {
+        return true;
+    }
+    return false;
+
 }
 bool addShortcutToStartup(std::wstring exePath){
     std::wstring startupPath = GetStartupFolderPath();
@@ -181,47 +197,32 @@ bool addShortcutToStartup(std::wstring exePath){
     return hres;
 }
 // Function to delete the executable in the startup folder (if it exists)
-// Returns whether the executable is now in the startup folder
+// Returns whether a shortcut to the executable is now in the startup folder
 bool deleteShortcutInStartupFolder()
 {
-    wchar_t szPath[MAX_PATH];
-    if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_STARTUP, NULL, 0, szPath)))
-    {
-        // Generate the shortcut's path
-        std::wstring shortcutPath = std::wstring(szPath) + L"\\BetterWallpapers.lnk";
-
-        // Check if the file exists.
-        if (GetFileAttributes(shortcutPath.c_str()) != INVALID_FILE_ATTRIBUTES)
-        {
-            // Delete the shortcut file.
-            return !(DeleteFile(shortcutPath.c_str()) != 0);
-        }
+    std::wstring startupPath = GetStartupFolderPath();
+    if(startupPath.empty()){
+        // If we can't find the startuop folder we assume our executable isn't in there
+        return false;
     }
-    qDebug() << "Failed to find startup folder";
+    // Generate the shortcut's path
+    std::wstring shortcutPath = startupPath + L"\\BetterWallpapers.lnk";
+
+    // Check if the file exists.
+    if (GetFileAttributes(shortcutPath.c_str()) != INVALID_FILE_ATTRIBUTES)
+    {
+        // Delete the shortcut file.
+        return !(DeleteFile(shortcutPath.c_str()) != 0);
+    }
+
     // If we can't find the startuop folder we assume our executable isn't in there
     return false;
 }
 // Function to toggle whether the executable exists in the startup folder
 // Returns whether the shortcut exists (true) or doesn't or can't access the folder(false)
 bool toggleShortcut(std::wstring exePath){
-    wchar_t szPath[MAX_PATH];
-    bool exists = false;
-    if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_STARTUP, NULL, 0, szPath)))
-    {
-        // Generate the shortcut's path
-        std::wstring shortcutPath = std::wstring(szPath) + L"\\BetterWallpapers.lnk";
-
-        // Check if the file exists.
-        exists = GetFileAttributes(shortcutPath.c_str()) != INVALID_FILE_ATTRIBUTES;
-    }
-    else{
-        qDebug() << "Failed to find startup folder";
-        return false;
-    }
-    if(exists){
+    if(shortcutExists()){
         return deleteShortcutInStartupFolder();
     }
-    else{
-        return addShortcutToStartup(exePath);
-    }
+    return addShortcutToStartup(exePath);
 }
