@@ -34,13 +34,10 @@ static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, voi
 
     return realsize;
 }
-// Function to download the latest unslpash image given the latest date of the current one
-std::string getUnsplashNewImg(QString latestDate, QString path){
-    // If we already have the latest image don't get a new one
-    if(getCurrentDate().compare(latestDate) <= 0){
-        return "";
-    }
-    CURL *curl_handle;
+QString getUnsplashURL(QString path){
+    curl_global_init(CURL_GLOBAL_ALL);
+    /* init the curl session */
+    CURL *curl_handle = curl_easy_init();
     CURLcode res;
 
     struct MemoryStruct chunk;
@@ -48,11 +45,6 @@ std::string getUnsplashNewImg(QString latestDate, QString path){
     chunk.memory = (char*)malloc(1);  /* grown as needed by the realloc above */
     chunk.memory[0] = (char)0;
     chunk.size = 0;    /* no data at this point */
-
-    curl_global_init(CURL_GLOBAL_ALL);
-
-    /* init the curl session */
-    curl_handle = curl_easy_init();
 
     /* specify URL to get */
     curl_easy_setopt(curl_handle, CURLOPT_URL, "https://unsplash.com/collections/1459961/photo-of-the-day-(archive)");
@@ -106,10 +98,34 @@ std::string getUnsplashNewImg(QString latestDate, QString path){
         counter++;
     }
     URL[urlCounter] = (char)0;
+    curl_easy_cleanup(curl_handle);
+    curl_global_cleanup();
+    return URL;
+}
 
-    //Now we have the URL download the image
+// Function to download the latest unslpash image given the latest date of the current one
+std::string getUnsplashNewImg(QString latestDate, QString path){
+    // If we already have the latest image don't get a new one
+    if(getCurrentDate().compare(latestDate) <= 0){
+        return "";
+    }
+
+    curl_global_init(CURL_GLOBAL_ALL);
+    /* init the curl session */
+    CURL *curl_handle = curl_easy_init();
+    CURLcode res;
+    QString URL = getUnsplashURL(path);
     /* specify URL to get */
-    curl_easy_setopt(curl_handle, CURLOPT_URL, URL);
+    curl_easy_setopt(curl_handle, CURLOPT_URL, URL.toStdString().c_str());
+
+    /* Add a certificate */
+    curl_easy_setopt(curl_handle, CURLOPT_CAINFO, (path + "curl-ca-bundle.crt").toStdString().c_str());
+
+    /* some servers do not like requests that are made without a user-agent
+     field, so we provide one */
+    curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, (path + "libcurl-agent/1.0").toStdString().c_str());
+
+
     curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, write_data);
     // Allow redirects
     curl_easy_setopt(curl_handle, CURLOPT_FOLLOWLOCATION , 1);

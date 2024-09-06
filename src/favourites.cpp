@@ -15,6 +15,7 @@ std::string getFavouriteNewImg(QString path){
     else{
         QJsonObject json = QJsonDocument().fromJson(file.readAll()).object();
     }
+    // TODO
     file.close();
     return "";
 }
