@@ -57,6 +57,7 @@ bool favouriteCurrentImg(WallpaperOptions* options){
             qDebug() << "favourites.json is not valid JSON";
             return false;
         }
+        // close and re-open file because ReadWrite doesn't overwrite
         file.close();
         file.open(QIODevice::WriteOnly);
         QJsonObject json = document.object();
@@ -66,11 +67,13 @@ bool favouriteCurrentImg(WallpaperOptions* options){
         if(json.contains("favourites") && json["favourites"].isArray()){
             arr = json["favourites"].toArray();
         }
-        // Add the new URL to the array
+        // Add the new URL to the array if it is not already present
         if(!arr.contains(URL)){
             arr.append(URL);
         }
+        // Reassign the new arr
         json["favourites"] = arr;
+        // Save the file
         file.write(QJsonDocument(json).toJson());
         file.close();
         return true;
