@@ -35,7 +35,6 @@ void onTrayIconActivated(QSystemTrayIcon::ActivationReason reason) {
 
         if(mainWindow == NULL){
             launchWindow(options);
-            qDebug() << "NULL";
         }
 
     }
@@ -76,9 +75,14 @@ int main(int argc, char *argv[]){
 
     // Create a menu for the tray icon
     QMenu trayMenu;
-    QAction *quitAction = new QAction("Quit", &trayMenu);
+    QAction *quitAction = new QAction("Quit" , &trayMenu);
     QObject::connect(quitAction, &QAction::triggered, app, &QApplication::quit);
+    QAction *settingsAction = new QAction("Launch settings" , &trayMenu);
+    QObject::connect(settingsAction, &QAction::triggered, app, [](){
+        launchWindow(options);
+    });
     trayMenu.addAction(quitAction);
+    trayMenu.addAction(settingsAction);
     trayIcon.setContextMenu(&trayMenu);
 
     // Add left click functionality to the icon
@@ -86,7 +90,7 @@ int main(int argc, char *argv[]){
     // Show the tray icon
     trayIcon.show();
     options->saveJson();
-    launchWindow(options);
+    //launchWindow(options);
 
 
     QThread *thread = QThread::create([]() { wallpaper_loop(options); });
