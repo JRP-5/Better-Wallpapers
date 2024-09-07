@@ -66,8 +66,8 @@ void checkForNewImg(WallpaperOptions *options, QString date){
     else if(options->potdSource == "Nasa"){
         imgPath = getNasaNewImg(date, options->jsonPath);
     }
-    else if(options->potdSource == "Random Favourite"){
-        imgPath = getFavouriteNewImg(options->jsonPath);
+    else if(options->potdSource == "Random-Favourite"){
+        imgPath = getFavouriteNewImg(date, options->jsonPath);
     }
 
     if(imgPath != ""){

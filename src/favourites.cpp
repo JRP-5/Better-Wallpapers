@@ -17,7 +17,11 @@ static size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream)
     return written;
 }
 
-std::string getFavouriteNewImg(QString path){
+std::string getFavouriteNewImg(QString latestDate, QString path){
+    // If we already have the latest image don't get a new one
+    if(getCurrentDate().compare(latestDate) <= 0){
+        return "";
+    }
     QFile file(path + "favourites.json");
     if (!file.open(QIODevice::ReadOnly)) {
         // If we can't read the favourites return nothing
@@ -53,19 +57,20 @@ std::string getFavouriteNewImg(QString path){
     curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, (path + "libcurl-agent/1.0").toStdString().c_str());
     // Allow redirects
     curl_easy_setopt(curl_handle, CURLOPT_FOLLOWLOCATION , 1);
-    // Call the file currentDateFav.jpg so we can delete it when it hasn't been used in a while
-    QString pageFileName = path + getCurrentDate() + ".jpg";
+    // Call the file currentDate.jpg so we can delete it when it hasn't been used in a while
+
     // Now we'll store the image
 
     // If favourites directory doesn't exist create it
     struct stat st;
-    if(stat( (path + "images/favourites").toStdString().c_str(), &st) == -1) {
+    if(stat( (path + "images/Random-Favourite").toStdString().c_str(), &st) == -1) {
         //Check if images exists
         if(stat((path + "images").toStdString().c_str(),&st) == -1){
             mkdir((path + "images").toStdString().c_str());
         }
-        mkdir((path + "images/favourites").toStdString().c_str());
+        mkdir((path + "images/Random-Favourite").toStdString().c_str());
     }
+    QString pageFileName = path + "images/Random-Favourite/" + getCurrentDate() + ".jpg";
     /* open the file */
     FILE *pagefile = fopen(pageFileName.toStdString().c_str(), "wb");
     if (pagefile)
@@ -94,9 +99,12 @@ bool favouriteCurrentImg(WallpaperOptions* options){
     else if(options->potdSource == "Nasa"){
         URL = getNasaURL(options->jsonPath);
     }
+    else if(options->potdSource == "Random-Favourite"){
+        return true;
+    }
 
     if(URL == ""){
-        qDebug() << options->potdSource;
+        qDebug() << "Failed to retrieve URL of current image to add to favourites";
         return false;
     }
     QFile file(options->jsonPath + "favourites.json");

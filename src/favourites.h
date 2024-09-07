@@ -3,6 +3,6 @@
 #include <QString>
 #include "wallpaper_utils.h"
 bool favouriteCurrentImg(WallpaperOptions* options);
-std::string getFavouriteNewImg(QString path);
+std::string getFavouriteNewImg(QString latestDate, QString path);
 
 #endif // FAVOURITES_H

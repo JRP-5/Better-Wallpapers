@@ -65,6 +65,7 @@ QString getUnsplashURL(QString path){
     if(res != 0){
         return "";
     }
+    qDebug() << chunk.memory;
     int pos = std::string(chunk.memory).find("Download this image");
     // Search for href keyword
     int hrefEnd = 0;
