@@ -7,6 +7,7 @@
 #include <QThread>
 #include <iostream>
 #include "nasa.h"
+#include "icon.h"
 
 QMainWindow *mainWindow;
 QApplication *app;
@@ -72,7 +73,7 @@ int main(int argc, char *argv[]){
     app->setQuitOnLastWindowClosed(false);
 
     // Create the system tray icon
-    QSystemTrayIcon trayIcon = QIcon::fromTheme(QIcon::ThemeIcon::EditUndo);
+    QSystemTrayIcon trayIcon(QIcon(":/assets/icon.png"));
 
     // Create a menu for the tray icon
     QMenu trayMenu;
