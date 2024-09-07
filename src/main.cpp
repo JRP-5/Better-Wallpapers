@@ -7,7 +7,6 @@
 #include <QThread>
 #include <iostream>
 #include "nasa.h"
-#include "icon.h"
 
 QMainWindow *mainWindow;
 QApplication *app;

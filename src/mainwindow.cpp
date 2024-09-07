@@ -14,6 +14,9 @@
 MainWindow::MainWindow(QWidget *parent, WallpaperOptions *wallpaperOptions)
     : QMainWindow(parent)
 {
+    // Set the window icon
+    this->setWindowIcon(QIcon(":/assets/icon.png"));
+
     this->options = wallpaperOptions;
     // Create the main layout container
     QVBoxLayout *container = new QVBoxLayout();
