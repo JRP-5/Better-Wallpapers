@@ -37,7 +37,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         src/main.cpp
         src/nasa.h src/nasa.cpp
         src/favourites.h src/favourites.cpp
-        src/icon.h
+
         resources.qrc
 
 
