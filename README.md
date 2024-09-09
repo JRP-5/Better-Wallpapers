@@ -5,14 +5,14 @@ A lightweight c++ application which lives in the system tray and changes the use
 ## Features
 
 + Ability to control whether the application launches on user login, automatically updating their wallpaper
-+ Images can be favourited and then used again as random 
-+ bullet
-+ other bullet
-* another bullet
-    * child bullet
++ Multiple image of the day sources
+    - [Bing wallpaper of the day](https://www.microsoft.com/en-us/bing/bing-wallpaper), all regions
+    - [Unsplash](https://unsplash.com/collections/1459961/photo-of-the-day-(archive))
+    - [Nasa](https://www.nasa.gov/image-of-the-day/)
++ Images can be favourited and seen again by selection Random-Favourite
 
-1. ordered
-2. next ordered
+
+
 
 ### Third Level Heading
 
@@ -38,14 +38,6 @@ or with a reference like [this other link to the Qt homepage][1].
 >
 > and has the same paragraph rules as normal text.
 
-First Level Heading in Alternate Style
-======================================
 
-Paragraph.
-
-Second Level Heading in Alternate Style
----------------------------------------
-
-Paragraph.
 
 [1]: https://www.qt.io

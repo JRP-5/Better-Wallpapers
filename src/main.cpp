@@ -5,8 +5,6 @@
 #include <QTimer>
 #include "wallpaper_utils.h"
 #include <QThread>
-#include <iostream>
-#include "nasa.h"
 
 QMainWindow *mainWindow;
 QApplication *app;
