@@ -97,6 +97,7 @@ QString getUnsplashURL(QString path){
         }
         counter++;
     }
+    free(chunk.memory);
     URL[urlCounter] = (char)0;
 
     curl_easy_cleanup(curl_handle);
@@ -157,7 +158,6 @@ std::string getUnsplashNewImg(QString latestDate, QString path){
         /* close the header file */
         fclose(pagefile);
     }
-
     curl_easy_cleanup(curl_handle);
     curl_global_cleanup();
     return filePath.toStdString();

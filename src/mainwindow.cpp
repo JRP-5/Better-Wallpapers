@@ -25,11 +25,13 @@ MainWindow::MainWindow(QWidget *parent, WallpaperOptions *wallpaperOptions)
     container->addLayout(sourceLayout, 0);
 
     //Create the label for the potd drop down
-    QLabel *label = new QLabel("Picture of the day source");
+    QLabel *label = new QLabel("Picture of the day source", this);
+    label->setAttribute(Qt::WA_DeleteOnClose);
     sourceLayout->addWidget(label, 0, Qt::AlignCenter);
     // Picture of the day drop down
     QStringList commands = { "Bing", "Unsplash", "Nasa", "Random-Favourite"};
-    QComboBox* combo = new QComboBox();
+    QComboBox* combo = new QComboBox(this);
+    combo->setAttribute(Qt::WA_DeleteOnClose);
     combo->addItems(commands);
     connect( combo, &QComboBox::currentTextChanged, this, &MainWindow::sourceChanged);
     //Add it to the layout
@@ -38,24 +40,28 @@ MainWindow::MainWindow(QWidget *parent, WallpaperOptions *wallpaperOptions)
 
     // Create a region selection for bing region
     // Create a widget so we can show and hide it
-    QWidget *regionWidget = new QWidget();
+    QWidget *regionWidget = new QWidget(this);
+    regionWidget->setAttribute(Qt::WA_DeleteOnClose);
     regionWidget->setObjectName("region-widget");
     QHBoxLayout *regionLayout = new QHBoxLayout();
     regionWidget->setLayout(regionLayout);
     container->addWidget(regionWidget, 0);
 
     //Create a label for the regions
-    QLabel *regionLabel = new QLabel("Bing Region");
+    QLabel *regionLabel = new QLabel("Bing Region", this);
+    regionLabel->setAttribute(Qt::WA_DeleteOnClose);
     regionLayout->addWidget(regionLabel, 0, Qt::AlignCenter);
     //Create a combo box for all the regions and add the functionality
     QStringList regions = { "USA", "Great Britain", "China", "Japan", "Canada", "Australia", "New Zealand", "Germany", "Spain", "France", "Italy", "Brazil" };
-    QComboBox* regionChoice = new QComboBox();
+    QComboBox* regionChoice = new QComboBox(this);
+    regionChoice->setAttribute(Qt::WA_DeleteOnClose);
     regionChoice->addItems(regions);
     connect(regionChoice, &QComboBox::currentTextChanged, this, &MainWindow::bingRegionChanged);
     regionLayout->addWidget(regionChoice, 0, Qt::AlignCenter);
 
     // Create a button to add the current wallpaper to favourites
     QPushButton *favouriteButton = new QPushButton("Add Current Wallpaper\nto Favourites", this);
+    favouriteButton->setAttribute(Qt::WA_DeleteOnClose);
     favouriteButton->setFixedSize(150, 50);
     container->addWidget(favouriteButton, 0, Qt::AlignCenter);
     favouriteButton->show();
@@ -65,7 +71,8 @@ MainWindow::MainWindow(QWidget *parent, WallpaperOptions *wallpaperOptions)
 
 
     // Create a button to toggle between running the app on startup and not
-    QPushButton *startupButton = new QPushButton("Run on startup");
+    QPushButton *startupButton = new QPushButton("Run on startup", this);
+    startupButton->setAttribute(Qt::WA_DeleteOnClose);
     // Set the colour of the button depending on whether the shortcut exists
     if(shortcutExists()){
         startupButton->setStyleSheet("QPushButton{background-color:rgb(60, 179, 113);}");
@@ -89,6 +96,7 @@ MainWindow::MainWindow(QWidget *parent, WallpaperOptions *wallpaperOptions)
 
     // Create a widget to contain our layout
     QWidget *window = new QWidget(this);
+    window->setAttribute(Qt::WA_DeleteOnClose);
     window->setLayout(container);
     // Add the widget to the window
     this->setCentralWidget(window);

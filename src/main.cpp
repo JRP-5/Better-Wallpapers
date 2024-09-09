@@ -21,6 +21,7 @@ void launchWindow(WallpaperOptions *options){
     });
     // Create a button to compltely close the application
     QPushButton *closeButton = new QPushButton("Stop Wallpaper changer", mainWindow);
+    closeButton->setAttribute(Qt::WA_DeleteOnClose);
     closeButton->setFixedSize(180, 30);
     closeButton->setGeometry(10, 10, closeButton->width(), closeButton->height());
     closeButton->show();
@@ -33,8 +34,13 @@ void onTrayIconActivated(QSystemTrayIcon::ActivationReason reason) {
     // Check if the activation reason is a left-click
     if (reason == QSystemTrayIcon::Trigger) {
 
+        //qDebug() << mainWindow;
         if(mainWindow == NULL){
             launchWindow(options);
+            // TODO FREE WINDOW MEMORY ON CLOSE
+        }
+        else{
+            mainWindow->show();
         }
 
     }
@@ -59,8 +65,6 @@ int main(int argc, char *argv[]){
     // Get the executables current path
     std::string path = getExeFolder(argv[0]);
 
-    getNasaNewImg("-1", QString::fromStdString(path));
-
     // Read the user's options from options.json
     QString s = QString::fromStdString(path);
     options = getJsonFromPath(s);
@@ -69,7 +73,6 @@ int main(int argc, char *argv[]){
     app = new QApplication(argc, argv);
     // Make sure the application doesn't quit when we close the settings window
     app->setQuitOnLastWindowClosed(false);
-
     // Create the system tray icon
     QSystemTrayIcon trayIcon(QIcon(":/assets/icon.png"));
 

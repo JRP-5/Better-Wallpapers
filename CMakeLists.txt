@@ -39,6 +39,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         src/favourites.h src/favourites.cpp
 
         resources.qrc
+        README.md
 
 
 
