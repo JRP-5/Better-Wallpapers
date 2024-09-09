@@ -14,8 +14,8 @@ A lightweight Windows c++ application which lives in the system tray and changes
 + Built for efficiency and minimal system impact when running 24/7
 
 ## Install and Run
-Pre-compiled [binaries](releases) are available for windows 
-### Dependencies
+Pre-compiled [binaries](https://github.com/JRP-5/Better-Wallpapers/releases) are available for windows 
+## Built With
 + [QT](https://www.qt.io/)
 + [libCurl](https://curl.se/libcurl/c/)
 
