@@ -32,6 +32,12 @@ void deleteOldImgs(string path, int days){
     strftime(oldDate, sizeof(oldDate), "%Y%m%d", timeinfo);
     // For every file in the path
     for (const auto & entry : fs::directory_iterator(path)){
+        // Make sure it is an image
+        string fileName = entry.path().filename().string();
+        //qDebug()  << fileName;
+        if(fileName.substr(fileName.length() -4, 4) != ".jpg"){
+            continue;
+        }
         // If the image is older than the date delete it
         string fileDate = entry.path().filename().string().substr(0, 8);
         if(strcmp(oldDate, fileDate.c_str()) >= 0){
@@ -72,6 +78,8 @@ void checkForNewImg(WallpaperOptions *options, QString date){
 
     if(imgPath != ""){
         setPhoto(imgPath);
+        //If we have set a new photo delete any old ones
+        deleteOldImgs((options->jsonPath + "images/" + options->potdSource).toStdString(), 3);
     }
 }
 void WallpaperOptions::saveJson(){
