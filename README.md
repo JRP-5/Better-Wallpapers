@@ -1,6 +1,6 @@
 # Better Wallpapers
 
-A lightweight c++ application which lives in the system tray and changes the user's wallpaper everyday based on their selection from various image of the day sources.
+A lightweight Windows c++ application which lives in the system tray and changes the user's wallpaper everyday based on their selection from various image of the day sources.
 
 ## Features
 
@@ -9,35 +9,19 @@ A lightweight c++ application which lives in the system tray and changes the use
     - [Bing wallpaper of the day](https://www.microsoft.com/en-us/bing/bing-wallpaper), all regions
     - [Unsplash](https://unsplash.com/collections/1459961/photo-of-the-day-(archive))
     - [Nasa](https://www.nasa.gov/image-of-the-day/)
-+ Images can be favourited and seen again by selection Random-Favourite
++ Images can be favourited and seen again by selecting Random-Favourite
++ Runs in the system tray, with a GUI to change preferences
++ Built for efficiency and minimal system impact when running 24/7
+
+## Install and Run
+Pre-compiled [binaries](/releases) are available for windows 
+### Dependencies
++ [QT](https://www.qt.io/)
++ [libCurl](https://curl.se/libcurl/c/)
 
 
 
 
-### Third Level Heading
-
-Some *italic* and **bold** text and `inline code`.
-
-An empty line starts a new paragraph.
-
-Use two spaces at the end  
-to force a line break.
-
-A horizontal ruler follows:
-
----
-
-Add links inline like [this link to the Qt homepage](https://www.qt.io),
-or with a reference like [this other link to the Qt homepage][1].
-
-    Add code blocks with
-    four spaces at the front.
-
-> A blockquote
-> starts with >
->
-> and has the same paragraph rules as normal text.
 
 
 
-[1]: https://www.qt.io

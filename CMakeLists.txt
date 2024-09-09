@@ -9,9 +9,8 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -lcurl")
-# set(CURL_LIBRARY "-lcurl")
-list(APPEND CMAKE_PREFIX_PATH "../../curl-8.9.1_1-win64-mingw")
+
+
 add_definitions(-DCURL_STATICLIB)
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
@@ -19,7 +18,6 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 find_package(CURL REQUIRED)
 
 set(PROJECT_SOURCES
-        src/main.cpp
         src/mainwindow.cpp
         src/mainwindow.h
         src/bing_wallpaper.cpp
@@ -28,6 +26,8 @@ set(PROJECT_SOURCES
         src/wallpaper_utils.h
         src/unsplash.cpp
         src/unsplash.h
+        src/nasa.h src/nasa.cpp
+        src/favourites.h src/favourites.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -35,9 +35,6 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
         src/main.cpp
-        src/nasa.h src/nasa.cpp
-        src/favourites.h src/favourites.cpp
-
         resources.qrc
         README.md
 
